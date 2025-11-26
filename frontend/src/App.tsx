@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ProjectGrid } from "./components/ProjectGrid";
 import { ProjectDetail } from "./components/ProjectDetail";
 import { FilterBar } from "./components/FilterBar";
+import { AddProjectDialog } from "./components/AddProjectDialog";
 import type { Project } from "./types/project";
+import { ArrowRight } from "lucide-react";
 
 const JHC_BACKGROUND =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=80";
 
 // Mock project data
-const projects: Project[] = [
+const initialProjects: Project[] = [
   {
     id: "1",
     title: "Smart Indoor Garden",
@@ -140,6 +142,7 @@ const projects: Project[] = [
 ];
 
 export default function App() {
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [selectedProject, setSelectedProject] =
     useState<Project | null>(null);
   const [filteredCategory, setFilteredCategory] =
@@ -147,10 +150,19 @@ export default function App() {
   const [filteredStatus, setFilteredStatus] =
     useState<string>("All");
   const [showHeader, setShowHeader] = useState(true);
+  const [isAtBottom, setIsAtBottom] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setShowHeader(window.scrollY < 10);
+      
+      // Check if user is at the bottom of the page
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const isBottom = scrollTop + windowHeight >= documentHeight - 50; // 50px threshold
+      
+      setIsAtBottom(isBottom);
     };
 
     handleScroll();
@@ -162,15 +174,37 @@ export default function App() {
       window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const filteredProjects = projects.filter((project) => {
-    const matchesCategory =
-      filteredCategory === "All" ||
-      project.category === filteredCategory;
-    const matchesStatus =
-      filteredStatus === "All" ||
-      project.status === filteredStatus;
-    return matchesCategory && matchesStatus;
-  });
+  const filteredProjects = useMemo(
+    () =>
+      projects.filter((project) => {
+        const matchesCategory =
+          filteredCategory === "All" ||
+          project.category === filteredCategory;
+        const matchesStatus =
+          filteredStatus === "All" ||
+          project.status === filteredStatus;
+        return matchesCategory && matchesStatus;
+      }),
+    [projects, filteredCategory, filteredStatus],
+  );
+
+  const handleAddProject = (project: Project) => {
+    setProjects((prev) => [...prev, project]);
+    setFilteredCategory("All");
+    setFilteredStatus("All");
+  };
+
+  const handleDeleteProject = (projectId: string) => {
+    setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    if (selectedProject?.id === projectId) {
+      setSelectedProject(null);
+    }
+  };
+
+  const categories = useMemo(
+    () => [...new Set(projects.map((project) => project.category))],
+    [projects],
+  );
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -201,6 +235,21 @@ export default function App() {
 
       {/* Main Content */}
       <main className="max-w-[1800px] mx-auto px-12 py-10">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+          <div>
+            <h2 className="text-slate-100 text-2xl font-medium">
+              Project Portfolio
+            </h2>
+            <p className="text-slate-400">
+              Track and showcase ongoing innovation projects
+            </p>
+          </div>
+          <AddProjectDialog
+            onAdd={handleAddProject}
+            existingCategories={categories}
+          />
+        </div>
+
         <FilterBar
           selectedCategory={filteredCategory}
           selectedStatus={filteredStatus}
@@ -227,7 +276,52 @@ export default function App() {
       <ProjectDetail
         project={selectedProject}
         onClose={() => setSelectedProject(null)}
+        onDelete={handleDeleteProject}
       />
+
+      {/* Semi-hidden "Ready to take the next step" link with page curl effect */}
+      <a
+        href="https://www.forwardbylutes.fi/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`fixed bottom-8 right-8 z-50 transition-opacity duration-500 ${isAtBottom ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+      >
+          <div className="relative">
+            {/* Green background - visible under curl */}
+            <div 
+              className="absolute -bottom-2 -right-2 w-full h-full bg-green-600 rounded-lg"
+              style={{ transform: 'rotate(-2deg)' }}
+            ></div>
+            
+            {/* White banner with subtle curl */}
+            <div 
+              className="relative bg-white rounded-lg shadow-lg px-5 py-3 flex items-center gap-2"
+              style={{ transform: 'rotate(-2deg)' }}
+            >
+              {/* Curled corner - bottom right */}
+              <div 
+                className="absolute -bottom-1 -right-1 w-8 h-8 bg-gray-300 rounded-tl-full"
+                style={{
+                  transform: 'rotate(45deg)',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                }}
+              ></div>
+              
+              {/* Green peek-through under curl */}
+              <div 
+                className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-600 rounded-tl-full"
+                style={{
+                  transform: 'rotate(45deg) translate(2px, 2px)',
+                }}
+              ></div>
+              
+              <span className="text-sm font-medium text-gray-700 relative z-10">
+                Ready to take the next step
+              </span>
+              <ArrowRight className="w-4 h-4 text-gray-700 relative z-10" />
+            </div>
+          </div>
+        </a>
     </div>
   );
 }

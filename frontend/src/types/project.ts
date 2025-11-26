@@ -5,7 +5,8 @@ export interface Project {
   category: string;
   status: 'In Progress' | 'Testing' | 'Completed';
   team: string[];
-  image: string;
+  image?: string;
+  imageUrl?: string;
   startDate: string;
   technologies: string[];
 }

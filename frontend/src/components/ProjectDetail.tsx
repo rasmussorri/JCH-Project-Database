@@ -1,14 +1,17 @@
+import { useState } from 'react';
 import type { Project } from '../types/project';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
-import { Calendar, Users, Code2, Info } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Calendar, Users, Code2, Info, Trash2 } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 
 interface ProjectDetailProps {
   project: Project | null;
   onClose: () => void;
+  onDelete?: (projectId: string) => void;
 }
 
 const imageMap: Record<string, string> = {
@@ -36,7 +39,9 @@ const categoryColors = {
   'AI/ML': 'bg-indigo-600/90 text-indigo-100 hover:bg-indigo-600/90',
 };
 
-export function ProjectDetail({ project, onClose }: ProjectDetailProps) {
+export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   if (!project) return null;
 
   const getInitials = (name: string) => {
@@ -47,16 +52,41 @@ export function ProjectDetail({ project, onClose }: ProjectDetailProps) {
       .toUpperCase();
   };
 
+  const handleConfirmDelete = () => {
+    if (onDelete) {
+      onDelete(project.id);
+    }
+    setShowDeleteDialog(false);
+    onClose();
+  };
+
   return (
-    <Dialog open={!!project} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-slate-900 border-slate-800">
-        <ScrollArea className="max-h-[90vh]">
+    <>
+      <Dialog open={!!project} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-slate-900 border-slate-800">
+          <ScrollArea className="max-h-[90vh]">
           <div className="relative h-80 overflow-hidden bg-slate-800">
-            <ImageWithFallback
-              src={imageMap[project.image]}
-              alt={project.title}
-              className="w-full h-full object-cover"
-            />
+            {(() => {
+              const imageSrc =
+                project.imageUrl ??
+                (project.image ? imageMap[project.image] : undefined);
+
+              if (!imageSrc) {
+                return (
+                  <div className="w-full h-full flex items-center justify-center text-slate-500">
+                    No image provided
+                  </div>
+                );
+              }
+
+              return (
+                <ImageWithFallback
+                  src={imageSrc}
+                  alt={project.title}
+                  className="w-full h-full object-cover"
+                />
+              );
+            })()}
             <div className="absolute top-6 right-6 flex gap-3">
               <Badge className={statusColors[project.status]}>
                 {project.status}
@@ -134,7 +164,47 @@ export function ProjectDetail({ project, onClose }: ProjectDetailProps) {
             </div>
           </div>
         </ScrollArea>
+        {onDelete && (
+          <DialogFooter className="border-t border-slate-800 px-8 py-4">
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Project
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
+
+    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <DialogContent className="bg-slate-900 border-slate-800">
+        <DialogHeader>
+          <DialogTitle className="text-slate-100">Delete Project</DialogTitle>
+        </DialogHeader>
+        <p className="text-slate-300 py-4">
+          Are you sure you want to delete <span className="font-semibold">{project.title}</span>? This action cannot be undone.
+        </p>
+        <DialogFooter>
+          <Button
+            variant="ghost"
+            onClick={() => setShowDeleteDialog(false)}
+            className="text-slate-300 hover:text-slate-100"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleConfirmDelete}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

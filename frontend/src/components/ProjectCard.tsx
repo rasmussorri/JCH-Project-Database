@@ -7,7 +7,7 @@ import { Calendar, Users } from 'lucide-react';
 
 interface ProjectCardProps {
   project: Project;
-  imageUrl: string;
+  imageUrl?: string;
   onClick: () => void;
 }
 
@@ -39,11 +39,17 @@ export function ProjectCard({ project, imageUrl, onClick }: ProjectCardProps) {
       onClick={onClick}
     >
       <div className="relative h-56 overflow-hidden bg-slate-800">
-        <ImageWithFallback
-          src={imageUrl}
-          alt={project.title}
-          className="w-full h-full object-cover"
-        />
+        {imageUrl ? (
+          <ImageWithFallback
+            src={imageUrl}
+            alt={project.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-slate-800 text-slate-500">
+            No image
+          </div>
+        )}
         <div className="absolute top-4 right-4">
           <Badge className={statusColors[project.status]}>
             {project.status}

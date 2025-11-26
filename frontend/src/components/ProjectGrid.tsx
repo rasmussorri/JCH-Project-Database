@@ -25,7 +25,7 @@ export function ProjectGrid({ projects, onProjectClick }: ProjectGridProps) {
         <ProjectCard
           key={project.id}
           project={project}
-          imageUrl={imageMap[project.image]}
+          imageUrl={project.imageUrl ?? (project.image ? imageMap[project.image] : undefined)}
           onClick={() => onProjectClick(project)}
         />
       ))}
