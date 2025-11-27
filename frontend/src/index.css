@@ -192,3 +192,55 @@
 html {
   font-size: var(--font-size);
 }
+
+/* Curl element styles */
+.curl {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: scale(0.5);
+  transform-origin: bottom right;
+  background: linear-gradient(
+    135deg,
+    #fff,
+    #f3f3f3 45%,
+    #ddd 50%,
+    #aaa 50%,
+    #bbb 56%,
+    #ccc 62%,
+    #f3f3f3 80%,
+    #fff 100%
+  );
+  transition: all 0.5s ease;
+}
+
+.curl::before,
+.curl::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 12.5%;
+  bottom: 5.8%;
+  width: 70%;
+  max-width: 300px;
+  max-height: 100px;
+  height: 55%;
+  transform: skew(-10deg) rotate(-6deg);
+}
+
+.curl::after {
+  left: auto;
+  right: 5.8%;
+  bottom: auto;
+  top: 14.16%;
+  transform: skew(-15deg) rotate(-84deg);
+}
+
+.curl:hover {
+  width: 150px;
+  height: 150px;
+  transform: scale(0.6);
+  transform-origin: bottom right;
+}

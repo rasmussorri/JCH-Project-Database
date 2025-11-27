@@ -152,19 +152,10 @@ export default function App() {
   const [filteredStatus, setFilteredStatus] =
     useState<string>("All");
   const [showHeader, setShowHeader] = useState(true);
-  const [isAtBottom, setIsAtBottom] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setShowHeader(window.scrollY < 10);
-      
-      // Check if user is at the bottom of the page
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const isBottom = scrollTop + windowHeight >= documentHeight - 50; // 50px threshold
-      
-      setIsAtBottom(isBottom);
     };
 
     handleScroll();
@@ -222,7 +213,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-slate-950 relative">
       {/* Header with JHC Banner */}
       <header
         className={`relative border-b border-slate-800 sticky top-0 z-10 shadow-xl overflow-hidden transition-transform duration-300 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
@@ -287,34 +278,27 @@ export default function App() {
         )}
       </main>
 
+      {/* Page curl CTA */}
+      <a
+        href="https://www.forwardbylutes.fi/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-0 right-0 z-50"
+      >
+        <span className="absolute bottom-1 right-[68px] text-white text-sm italic font-serif whitespace-nowrap">
+          Ready take the next step?
+        </span>
+        <div className="relative w-[150px] h-[150px] overflow-visible">
+          <div className="curl" />
+        </div>
+      </a>
+
       {/* Project Detail Dialog */}
       <ProjectDetail
         project={selectedProject}
         onClose={() => setSelectedProject(null)}
         onDelete={handleDeleteProject}
       />
-
-      {/* Page roll element with cursive text */}
-      <a
-        href="https://www.forwardbylutes.fi/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`fixed bottom-8 right-8 z-50 transition-opacity duration-500 flex items-end gap-3 ${isAtBottom ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-      >
-        {/* Cursive text */}
-        <span className="text-white text-lg italic font-serif mb-1">
-          Ready take the next step?
-        </span>
-        
-        {/* Page roll element */}
-        <div className="relative">
-          {/* Green background layer */}
-          <div className="absolute inset-0 bg-green-600 rounded-lg" style={{ transform: 'rotate(-3deg)' }}></div>
-          
-          {/* White page */}
-          <div className="relative bg-white w-20 h-20 rounded-lg shadow-lg" style={{ transform: 'rotate(-3deg)' }}></div>
-        </div>
-      </a>
     </div>
   );
 }
