@@ -4,10 +4,12 @@ import { ProjectDetail } from "./components/ProjectDetail";
 import { FilterBar } from "./components/FilterBar";
 import { AddProjectDialog } from "./components/AddProjectDialog";
 import type { Project } from "./types/project";
-import { ArrowRight } from "lucide-react";
 
 const JHC_BACKGROUND =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=80";
+
+// Admin password for deleting any project
+const ADMIN_PASSWORD = "admin123";
 
 // Mock project data
 const initialProjects: Project[] = [
@@ -194,11 +196,24 @@ export default function App() {
     setFilteredStatus("All");
   };
 
-  const handleDeleteProject = (projectId: string) => {
+  const handleDeleteProject = (projectId: string, password: string): boolean => {
+    const project = projects.find((p) => p.id === projectId);
+    if (!project) return false;
+
+    // Check if password matches admin password or project password
+    const isValidPassword =
+      password === ADMIN_PASSWORD ||
+      (project.password && password === project.password);
+
+    if (!isValidPassword) {
+      return false;
+    }
+
     setProjects((prev) => prev.filter((p) => p.id !== projectId));
     if (selectedProject?.id === projectId) {
       setSelectedProject(null);
     }
+    return true;
   };
 
   const categories = useMemo(
@@ -279,49 +294,27 @@ export default function App() {
         onDelete={handleDeleteProject}
       />
 
-      {/* Semi-hidden "Ready to take the next step" link with page curl effect */}
+      {/* Page roll element with cursive text */}
       <a
         href="https://www.forwardbylutes.fi/"
         target="_blank"
         rel="noopener noreferrer"
-        className={`fixed bottom-8 right-8 z-50 transition-opacity duration-500 ${isAtBottom ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed bottom-8 right-8 z-50 transition-opacity duration-500 flex items-end gap-3 ${isAtBottom ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
       >
-          <div className="relative">
-            {/* Green background - visible under curl */}
-            <div 
-              className="absolute -bottom-2 -right-2 w-full h-full bg-green-600 rounded-lg"
-              style={{ transform: 'rotate(-2deg)' }}
-            ></div>
-            
-            {/* White banner with subtle curl */}
-            <div 
-              className="relative bg-white rounded-lg shadow-lg px-5 py-3 flex items-center gap-2"
-              style={{ transform: 'rotate(-2deg)' }}
-            >
-              {/* Curled corner - bottom right */}
-              <div 
-                className="absolute -bottom-1 -right-1 w-8 h-8 bg-gray-300 rounded-tl-full"
-                style={{
-                  transform: 'rotate(45deg)',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                }}
-              ></div>
-              
-              {/* Green peek-through under curl */}
-              <div 
-                className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-600 rounded-tl-full"
-                style={{
-                  transform: 'rotate(45deg) translate(2px, 2px)',
-                }}
-              ></div>
-              
-              <span className="text-sm font-medium text-gray-700 relative z-10">
-                Ready to take the next step
-              </span>
-              <ArrowRight className="w-4 h-4 text-gray-700 relative z-10" />
-            </div>
-          </div>
-        </a>
+        {/* Cursive text */}
+        <span className="text-white text-lg italic font-serif mb-1">
+          Ready take the next step?
+        </span>
+        
+        {/* Page roll element */}
+        <div className="relative">
+          {/* Green background layer */}
+          <div className="absolute inset-0 bg-green-600 rounded-lg" style={{ transform: 'rotate(-3deg)' }}></div>
+          
+          {/* White page */}
+          <div className="relative bg-white w-20 h-20 rounded-lg shadow-lg" style={{ transform: 'rotate(-3deg)' }}></div>
+        </div>
+      </a>
     </div>
   );
 }

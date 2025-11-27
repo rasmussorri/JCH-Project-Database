@@ -20,15 +20,29 @@ const imageMap: Record<string, string> = {
 
 export function ProjectGrid({ projects, onProjectClick }: ProjectGridProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-      {projects.map((project) => (
-        <ProjectCard
-          key={project.id}
-          project={project}
-          imageUrl={project.imageUrl ?? (project.image ? imageMap[project.image] : undefined)}
-          onClick={() => onProjectClick(project)}
-        />
-      ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+      {projects.map((project) => {
+        // Build image array: prioritize imageUrls, fallback to imageUrl, then imageMap
+        const images: string[] = [];
+        
+        if (project.imageUrls && project.imageUrls.length > 0) {
+          images.push(...project.imageUrls);
+        } else if (project.imageUrl) {
+          images.push(project.imageUrl);
+        } else if (project.image && imageMap[project.image]) {
+          images.push(imageMap[project.image]);
+        }
+
+        return (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            imageUrl={images.length > 0 ? images[0] : undefined}
+            imageUrls={images.length > 0 ? images : undefined}
+            onClick={() => onProjectClick(project)}
+          />
+        );
+      })}
     </div>
   );
 }

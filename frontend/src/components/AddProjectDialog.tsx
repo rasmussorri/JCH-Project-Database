@@ -26,6 +26,7 @@ interface FormState {
   team: string;
   technologies: string;
   imageUrl: string;
+  password: string;
 }
 
 export function AddProjectDialog({
@@ -33,7 +34,7 @@ export function AddProjectDialog({
   existingCategories,
 }: AddProjectDialogProps) {
   const [open, setOpen] = useState(false);
-  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const [imageDataUrls, setImageDataUrls] = useState<string[]>([]);
   const [form, setForm] = useState<FormState>(() => ({
     title: '',
     description: '',
@@ -43,9 +44,16 @@ export function AddProjectDialog({
     team: '',
     technologies: '',
     imageUrl: '',
+    password: '',
   }));
 
-  const imagePreview = imageDataUrl ?? (form.imageUrl.trim() || null);
+  // Combine uploaded images and URL images for preview
+  const imagePreviews: string[] = [
+    ...imageDataUrls,
+    ...(form.imageUrl.trim() 
+      ? form.imageUrl.split(',').map(url => url.trim()).filter(Boolean)
+      : [])
+  ];
 
   const isSubmitDisabled = useMemo(() => {
     return !form.title.trim() || !form.description.trim();
@@ -61,8 +69,9 @@ export function AddProjectDialog({
       team: '',
       technologies: '',
       imageUrl: '',
+      password: '',
     });
-    setImageDataUrl(null);
+    setImageDataUrls([]);
   };
 
   const handleChange = (
@@ -73,23 +82,41 @@ export function AddProjectDialog({
   };
 
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      setImageDataUrl(null);
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+      setImageDataUrls([]);
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setImageDataUrl(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    const readers: Promise<string>[] = [];
+    Array.from(files).forEach((file) => {
+      const reader = new Promise<string>((resolve) => {
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+          if (typeof fileReader.result === 'string') {
+            resolve(fileReader.result);
+          } else {
+            resolve('');
+          }
+        };
+        fileReader.readAsDataURL(file);
+      });
+      readers.push(reader);
+    });
+
+    Promise.all(readers).then((results) => {
+      setImageDataUrls(results.filter(Boolean));
+    });
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Build imageUrls array from uploaded images and URL images
+    const urlImages = form.imageUrl.trim()
+      ? form.imageUrl.split(',').map(url => url.trim()).filter(Boolean)
+      : [];
+    const allImages = [...imageDataUrls, ...urlImages];
 
     const newProject: Project = {
       id: crypto.randomUUID?.() ?? Date.now().toString(),
@@ -106,7 +133,9 @@ export function AddProjectDialog({
         .split(',')
         .map((tech) => tech.trim())
         .filter(Boolean),
-      imageUrl: imagePreview ?? undefined,
+      imageUrl: allImages.length > 0 ? allImages[0] : undefined,
+      imageUrls: allImages.length > 0 ? allImages : undefined,
+      password: form.password.trim() || undefined,
     };
 
     onAdd(newProject);
@@ -228,37 +257,64 @@ export function AddProjectDialog({
 
             <div className="grid gap-4 md:grid-cols-2">
               <label className="flex flex-col gap-2">
-                <span className="text-sm text-slate-400">Image URL</span>
+                <span className="text-sm text-slate-400">Image URLs</span>
                 <input
                   name="imageUrl"
                   value={form.imageUrl}
                   onChange={(event) => {
-                    setImageDataUrl(null);
+                    setImageDataUrls([]);
                     handleChange(event);
                   }}
-                  placeholder="https://example.com/project.jpg"
+                  placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
                   className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
                 />
+                <span className="text-xs text-slate-500">
+                  Comma-separated URLs for multiple images
+                </span>
               </label>
               <label className="flex flex-col gap-2">
-                <span className="text-sm text-slate-400">Upload Image</span>
+                <span className="text-sm text-slate-400">Upload Images</span>
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={handleImageUpload}
                   className="rounded-lg border border-dashed border-slate-700 bg-slate-900 px-4 py-2 text-slate-400 file:mr-3 file:rounded-md file:border-0 file:bg-slate-800 file:px-3 file:py-1 file:text-slate-200 hover:border-cyan-500"
                 />
+                <span className="text-xs text-slate-500">
+                  Select multiple images (Ctrl/Cmd + Click)
+                </span>
               </label>
             </div>
 
-            {imagePreview && (
+            <label className="flex flex-col gap-2">
+              <span className="text-sm text-slate-400">Deletion Password</span>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Enter password for project deletion (optional)"
+                className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
+              />
+              <span className="text-xs text-slate-500">
+                Set a password to protect this project from deletion. Leave empty if not needed.
+              </span>
+            </label>
+
+            {imagePreviews.length > 0 && (
               <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-                <span className="text-sm text-slate-400">Image Preview</span>
-                <img
-                  src={imagePreview}
-                  alt="Project preview"
-                  className="mt-3 h-48 w-full rounded-lg object-cover"
-                />
+                <span className="text-sm text-slate-400">Image Preview ({imagePreviews.length})</span>
+                <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {imagePreviews.map((preview, index) => (
+                    <img
+                      key={index}
+                      src={preview}
+                      alt={`Project preview ${index + 1}`}
+                      className="h-32 w-full rounded-lg object-cover"
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </form>

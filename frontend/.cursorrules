@@ -1,0 +1,53 @@
+# Cursor Rules — JHC Project Database Frontend
+
+## Core Tech Stack
+- Use React + TypeScript + Vite + Tailwind CSS + shadcn/ui + Lucide
+- All UI components should follow shadcn/ui composition patterns
+
+## Components & TypeScript
+- Use functional components with named exports
+- Example: `export function ProjectCard() { ... }`
+- Define `ComponentNameProps` interface above each component
+- Avoid `any`; use union types for enums (e.g., `'In Progress' | 'Testing' | 'Completed'`)
+- Place all domain types in `src/types/` (e.g., `project.ts`)
+- Import types using `import type { ... }`
+
+## Styling & UI
+- Use Tailwind utility classes only (no inline styles except dynamic values)
+- Follow a dark theme using slate-based backgrounds:
+  - `bg-slate-950` (app)
+  - `bg-slate-900` (cards)
+  - `text-slate-100/400/500`
+- Use design tokens / class utilities whenever available (e.g., shadcn theme tokens)
+- Avoid hardcoded slate colors in new components
+- Use `ImageWithFallback` from `src/figma/ImageWithFallback.tsx` for all images, always providing an alt attribute
+- Use Lucide icons, imported individually (e.g. `import { Calendar } from "lucide-react"`)
+- Default sizes: `w-4 h-4` / `w-5 h-5`
+
+## Structure & Imports
+- Use this folder structure:
+  - `src/components/` → project components
+  - `src/ui/` → shadcn/ui components
+  - `src/types/` → all interfaces/types
+  - `src/ui/utils.ts` → utility functions (e.g., `cn` for className merging)
+  - `src/figma/` → ImageWithFallback component
+- Follow this import order:
+  1. React
+  2. External libs
+  3. shadcn/ui components (`src/ui/`)
+  4. Project components (`src/components/`)
+  5. Types (`src/types/`)
+  6. Utils (`src/ui/utils.ts`)
+
+## Code Quality & Performance
+- Use `useMemo` and `useCallback` only when needed — i.e., expensive computations or when memoized children require stable references
+- Keep components small and single-purpose
+- Split components >200 lines; abstract reusable logic into custom hooks
+- Handle missing/empty/null data safely
+- Use optional chaining (`project?.id`) and nullish coalescing (`value ?? fallback`)
+
+## UX, Modals, & Accessibility
+- Dialogs must use shadcn/ui's `<Dialog>` structure with proper focus management and keyboard accessibility
+- For fade/opacity transitions, do NOT unmount the element
+- Render it always, toggle visibility with Tailwind classes (`opacity-0 opacity-100 pointer-events-none`)
+

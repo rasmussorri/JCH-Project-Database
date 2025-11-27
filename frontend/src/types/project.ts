@@ -7,6 +7,8 @@ export interface Project {
   team: string[];
   image?: string;
   imageUrl?: string;
+  imageUrls?: string[];
   startDate: string;
   technologies: string[];
+  password?: string;
 }

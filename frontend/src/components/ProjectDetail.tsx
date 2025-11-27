@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import type { Project } from '../types/project';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { ImageWithFallback } from '../figma/ImageWithFallback';
+import { ImageCarousel } from './ImageCarousel';
 import { Button } from '../ui/button';
 import { Calendar, Users, Code2, Info, Trash2 } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
+import { PasswordDialog } from './PasswordDialog';
 
 interface ProjectDetailProps {
   project: Project | null;
   onClose: () => void;
-  onDelete?: (projectId: string) => void;
+  onDelete?: (projectId: string, password: string) => boolean;
 }
 
 const imageMap: Record<string, string> = {
@@ -41,6 +42,7 @@ const categoryColors = {
 
 export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   if (!project) return null;
 
@@ -52,39 +54,47 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
       .toUpperCase();
   };
 
-  const handleConfirmDelete = () => {
-    if (onDelete) {
-      onDelete(project.id);
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = (password: string) => {
+    if (!onDelete) return;
+
+    setPasswordError('');
+    const success = onDelete(project.id, password);
+    
+    if (success) {
+      setShowDeleteDialog(false);
+      onClose();
+    } else {
+      setPasswordError('Incorrect password. Please try again.');
     }
-    setShowDeleteDialog(false);
-    onClose();
   };
 
   return (
     <>
       <Dialog open={!!project} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-slate-900 border-slate-800">
-          <ScrollArea className="max-h-[90vh]">
-          <div className="relative h-80 overflow-hidden bg-slate-800">
+        <DialogContent className="max-w-6xl h-[90vh] max-h-[90vh] p-0 bg-slate-900 border-slate-800 flex flex-col">
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="relative h-80 overflow-hidden bg-slate-800">
             {(() => {
-              const imageSrc =
-                project.imageUrl ??
-                (project.image ? imageMap[project.image] : undefined);
-
-              if (!imageSrc) {
-                return (
-                  <div className="w-full h-full flex items-center justify-center text-slate-500">
-                    No image provided
-                  </div>
-                );
+              // Build image array: prioritize imageUrls, fallback to imageUrl, then imageMap
+              const images: string[] = [];
+              
+              if (project.imageUrls && project.imageUrls.length > 0) {
+                images.push(...project.imageUrls);
+              } else if (project.imageUrl) {
+                images.push(project.imageUrl);
+              } else if (project.image && imageMap[project.image]) {
+                images.push(imageMap[project.image]);
               }
 
               return (
-                <ImageWithFallback
-                  src={imageSrc}
-                  alt={project.title}
-                  className="w-full h-full object-cover"
-                />
+                <ImageCarousel images={images} alt={project.title} />
               );
             })()}
             <div className="absolute top-6 right-6 flex gap-3">
@@ -100,6 +110,9 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
           <div className="p-8 space-y-8">
             <DialogHeader>
               <DialogTitle className="text-slate-100">{project.title}</DialogTitle>
+              <DialogDescription className="text-slate-400">
+                {project.description}
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6">
@@ -163,13 +176,15 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
               </div>
             </div>
           </div>
-        </ScrollArea>
+            </ScrollArea>
+          </div>
         {onDelete && (
-          <DialogFooter className="border-t border-slate-800 px-8 py-4">
+          <DialogFooter className="border-t border-slate-800 px-8 py-4 flex-shrink-0 bg-slate-900 relative z-50 pointer-events-auto">
             <Button
+              type="button"
               variant="destructive"
-              onClick={() => setShowDeleteDialog(true)}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDeleteClick}
+              className="bg-red-600 hover:bg-red-700 text-white pointer-events-auto"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Project
@@ -179,32 +194,19 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
       </DialogContent>
     </Dialog>
 
-    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-      <DialogContent className="bg-slate-900 border-slate-800">
-        <DialogHeader>
-          <DialogTitle className="text-slate-100">Delete Project</DialogTitle>
-        </DialogHeader>
-        <p className="text-slate-300 py-4">
-          Are you sure you want to delete <span className="font-semibold">{project.title}</span>? This action cannot be undone.
-        </p>
-        <DialogFooter>
-          <Button
-            variant="ghost"
-            onClick={() => setShowDeleteDialog(false)}
-            className="text-slate-300 hover:text-slate-100"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleConfirmDelete}
-            className="bg-red-600 hover:bg-red-700 text-white"
-          >
-            Delete
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <PasswordDialog
+      open={showDeleteDialog}
+      onOpenChange={(open) => {
+        setShowDeleteDialog(open);
+        if (!open) {
+          setPasswordError('');
+        }
+      }}
+      onConfirm={handleConfirmDelete}
+      projectTitle={project.title}
+      hasProjectPassword={!!project.password}
+      error={passwordError}
+    />
     </>
   );
 }
