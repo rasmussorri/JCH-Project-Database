@@ -2,6 +2,35 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Project descriptions (rich text)
+
+Project descriptions are edited with a rich text editor (Bold, Italic, Underline) and stored as HTML in the `description_html` column (TEXT) on the `projects` table. If that column is missing, run `supabase/migrations/add_description_html.sql` in the Supabase SQL Editor. The app sanitizes HTML before rendering to prevent XSS.
+
+## Environment variables
+
+Create a `.env` file in `frontend/` with:
+
+```
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+You can copy the example file:
+
+```
+cp .env.example .env
+```
+
+### CORS / Edge Functions in local dev
+
+If saving a project fails with a CORS error and Supabase Edge Function logs are empty (preflight blocked at the gateway), use the dev proxy. In `.env` or `.env.local` add the **same** URL as your project (only for dev):
+
+```
+VITE_SUPABASE_PROXY_TARGET=https://your-project.supabase.co
+```
+
+Restart the dev server. The app will send requests to `localhost` and Vite will proxy them to Supabase, so the browser no longer triggers CORS.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh

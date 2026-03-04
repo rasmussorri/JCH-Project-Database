@@ -1,0 +1,10 @@
+{
+  "//": "Root package for running scripts from project root (e.g. npm run dev without cd frontend)",
+  "name": "jhc-project-database",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "preview": "npm run preview --prefix frontend"
+  }
+}

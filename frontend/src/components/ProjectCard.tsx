@@ -1,4 +1,5 @@
 import type { Project } from '../types/project';
+import { stripHtml } from '../lib/sanitizeHtml';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback } from '../ui/avatar';
@@ -62,7 +63,9 @@ export function ProjectCard({ project, imageUrl, imageUrls, onClick }: ProjectCa
             {project.category}
           </Badge>
         </div>
-        <p className="text-slate-400 text-sm line-clamp-2">{project.description}</p>
+        <p className="text-slate-400 text-sm line-clamp-2">
+          {stripHtml(project.description_html ?? project.description)}
+        </p>
       </CardHeader>
 
       <CardContent className="space-y-3 pb-3">

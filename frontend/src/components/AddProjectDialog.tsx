@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 
-import type { Project } from '../types/project';
+import type { CreateProjectPayload, Project } from '../types/project';
+import { RichTextEditor } from './RichTextEditor';
+import { stripHtml } from '../lib/sanitizeHtml';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -13,65 +16,59 @@ import { Button } from '../ui/button';
 import { ScrollArea } from '../ui/scroll-area';
 
 interface AddProjectDialogProps {
-  onAdd: (project: Project) => void;
+  onCreate: (payload: CreateProjectPayload) => Promise<void>;
   existingCategories: string[];
 }
 
 interface FormState {
   title: string;
-  description: string;
+  descriptionHtml: string;
   category: string;
   status: Project['status'];
   startDate: string;
   team: string;
   technologies: string;
-  imageUrl: string;
-  password: string;
+  deletePin: string;
 }
 
 export function AddProjectDialog({
-  onAdd,
+  onCreate,
   existingCategories,
 }: AddProjectDialogProps) {
   const [open, setOpen] = useState(false);
-  const [imageDataUrls, setImageDataUrls] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState<FormState>(() => ({
     title: '',
-    description: '',
+    descriptionHtml: '',
     category: existingCategories[0] ?? '',
     status: 'In Progress',
     startDate: new Date().toISOString().split('T')[0],
     team: '',
     technologies: '',
-    imageUrl: '',
-    password: '',
+    deletePin: '',
   }));
 
-  // Combine uploaded images and URL images for preview
-  const imagePreviews: string[] = [
-    ...imageDataUrls,
-    ...(form.imageUrl.trim() 
-      ? form.imageUrl.split(',').map(url => url.trim()).filter(Boolean)
-      : [])
-  ];
-
   const isSubmitDisabled = useMemo(() => {
-    return !form.title.trim() || !form.description.trim();
-  }, [form.title, form.description]);
+    return (
+      !form.title.trim() ||
+      !stripHtml(form.descriptionHtml).trim() ||
+      form.deletePin.trim().length < 4
+    );
+  }, [form.title, form.descriptionHtml, form.deletePin]);
 
   const resetForm = () => {
     setForm({
       title: '',
-      description: '',
+      descriptionHtml: '',
       category: existingCategories[0] ?? '',
       status: 'In Progress',
       startDate: new Date().toISOString().split('T')[0],
       team: '',
       technologies: '',
-      imageUrl: '',
-      password: '',
+      deletePin: '',
     });
-    setImageDataUrls([]);
+    setError('');
   };
 
   const handleChange = (
@@ -81,66 +78,55 @@ export function AddProjectDialog({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) {
-      setImageDataUrls([]);
+  const getInitials = (name: string) =>
+    name
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase();
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting) return;
+    if (form.deletePin.trim().length < 4) {
+      setError('Project PIN must be at least 4 characters.');
       return;
     }
 
-    const readers: Promise<string>[] = [];
-    Array.from(files).forEach((file) => {
-      const reader = new Promise<string>((resolve) => {
-        const fileReader = new FileReader();
-        fileReader.onload = () => {
-          if (typeof fileReader.result === 'string') {
-            resolve(fileReader.result);
-          } else {
-            resolve('');
-          }
-        };
-        fileReader.readAsDataURL(file);
+    setSubmitting(true);
+    setError('');
+
+    const members = form.team
+      .split(',')
+      .map((member) => member.trim())
+      .filter(Boolean)
+      .map((name) => ({ name, initials: getInitials(name) }));
+
+    const tech = form.technologies
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    try {
+      await onCreate({
+        title: form.title.trim(),
+        description_html: form.descriptionHtml.trim() || '<p></p>',
+        category: form.category.trim() || 'Uncategorized',
+        status: form.status,
+        startedAt: form.startDate,
+        deletePin: form.deletePin.trim(),
+        members,
+        tech,
       });
-      readers.push(reader);
-    });
-
-    Promise.all(readers).then((results) => {
-      setImageDataUrls(results.filter(Boolean));
-    });
-  };
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    // Build imageUrls array from uploaded images and URL images
-    const urlImages = form.imageUrl.trim()
-      ? form.imageUrl.split(',').map(url => url.trim()).filter(Boolean)
-      : [];
-    const allImages = [...imageDataUrls, ...urlImages];
-
-    const newProject: Project = {
-      id: crypto.randomUUID?.() ?? Date.now().toString(),
-      title: form.title.trim(),
-      description: form.description.trim(),
-      category: form.category.trim() || 'Uncategorized',
-      status: form.status,
-      startDate: form.startDate,
-      team: form.team
-        .split(',')
-        .map((member) => member.trim())
-        .filter(Boolean),
-      technologies: form.technologies
-        .split(',')
-        .map((tech) => tech.trim())
-        .filter(Boolean),
-      imageUrl: allImages.length > 0 ? allImages[0] : undefined,
-      imageUrls: allImages.length > 0 ? allImages : undefined,
-      password: form.password.trim() || undefined,
-    };
-
-    onAdd(newProject);
-    setOpen(false);
-    resetForm();
+      setOpen(false);
+      resetForm();
+    } catch (err) {
+      console.error('Failed to create project:', err);
+      setError('Failed to create project. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -152,9 +138,12 @@ export function AddProjectDialog({
       >
         + Add Project
       </Button>
-      <DialogContent className="max-w-3xl bg-slate-900 border-slate-800">
+      <DialogContent className="max-w-3xl bg-slate-900 border-slate-800" aria-describedby="add-project-description">
         <DialogHeader>
           <DialogTitle className="text-slate-100">Add New Project</DialogTitle>
+          <DialogDescription id="add-project-description" className="sr-only">
+            Form to add a new project with title, category, description, status, date, team, and technologies.
+          </DialogDescription>
         </DialogHeader>
         <ScrollArea className="max-h-[70vh] pr-4">
           <form
@@ -194,14 +183,11 @@ export function AddProjectDialog({
 
             <label className="flex flex-col gap-2">
               <span className="text-sm text-slate-400">Description *</span>
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                rows={4}
-                className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
+              <RichTextEditor
+                value={form.descriptionHtml}
+                onChange={(html) => setForm((prev) => ({ ...prev, descriptionHtml: html }))}
                 placeholder="Describe the project goals and outcomes..."
-                required
+                minHeight="120px"
               />
             </label>
 
@@ -255,66 +241,26 @@ export function AddProjectDialog({
               </label>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="flex flex-col gap-2">
-                <span className="text-sm text-slate-400">Image URLs</span>
-                <input
-                  name="imageUrl"
-                  value={form.imageUrl}
-                  onChange={(event) => {
-                    setImageDataUrls([]);
-                    handleChange(event);
-                  }}
-                  placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                  className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
-                />
-                <span className="text-xs text-slate-500">
-                  Comma-separated URLs for multiple images
-                </span>
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="text-sm text-slate-400">Upload Images</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  className="rounded-lg border border-dashed border-slate-700 bg-slate-900 px-4 py-2 text-slate-400 file:mr-3 file:rounded-md file:border-0 file:bg-slate-800 file:px-3 file:py-1 file:text-slate-200 hover:border-cyan-500"
-                />
-                <span className="text-xs text-slate-500">
-                  Select multiple images (Ctrl/Cmd + Click)
-                </span>
-              </label>
-            </div>
-
             <label className="flex flex-col gap-2">
-              <span className="text-sm text-slate-400">Deletion Password</span>
+              <span className="text-sm text-slate-400">Project PIN *</span>
               <input
                 type="password"
-                name="password"
-                value={form.password}
+                name="deletePin"
+                value={form.deletePin}
                 onChange={handleChange}
-                placeholder="Enter password for project deletion (optional)"
+                placeholder="Min 4 characters"
                 className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
+                minLength={4}
+                required
               />
               <span className="text-xs text-slate-500">
-                Set a password to protect this project from deletion. Leave empty if not needed.
+                Required for deleting this project and generating phone uploads.
               </span>
             </label>
 
-            {imagePreviews.length > 0 && (
-              <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-                <span className="text-sm text-slate-400">Image Preview ({imagePreviews.length})</span>
-                <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {imagePreviews.map((preview, index) => (
-                    <img
-                      key={index}
-                      src={preview}
-                      alt={`Project preview ${index + 1}`}
-                      className="h-32 w-full rounded-lg object-cover"
-                    />
-                  ))}
-                </div>
+            {error && (
+              <div className="rounded-lg border border-red-800 bg-red-900/20 p-3 text-sm text-red-400">
+                {error}
               </div>
             )}
           </form>
@@ -324,6 +270,7 @@ export function AddProjectDialog({
           <Button
             type="button"
             variant="ghost"
+            className="text-white hover:bg-white/10 hover:text-white"
             onClick={() => {
               resetForm();
               setOpen(false);
@@ -334,9 +281,10 @@ export function AddProjectDialog({
           <Button
             type="submit"
             form="add-project-form"
-            disabled={isSubmitDisabled}
+            disabled={isSubmitDisabled || submitting}
+            className="text-white bg-cyan-600 hover:bg-cyan-500"
           >
-            Save project
+            {submitting ? 'Saving...' : 'Save project'}
           </Button>
         </DialogFooter>
       </DialogContent>

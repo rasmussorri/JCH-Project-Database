@@ -8,7 +8,6 @@ interface PasswordDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: (password: string) => void;
   projectTitle: string;
-  hasProjectPassword: boolean;
   error?: string;
 }
 
@@ -17,7 +16,6 @@ export function PasswordDialog({
   onOpenChange,
   onConfirm,
   projectTitle,
-  hasProjectPassword,
   error: externalError,
 }: PasswordDialogProps) {
   const [password, setPassword] = useState('');
@@ -62,17 +60,11 @@ export function PasswordDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          {hasProjectPassword ? (
-            <p className="text-sm text-slate-400">
-              Enter the project password or admin password to proceed.
-            </p>
-          ) : (
-            <p className="text-sm text-slate-400">
-              Enter the admin password to proceed.
-            </p>
-          )}
+          <p className="text-sm text-slate-400">
+            Enter the project PIN or admin password to proceed.
+          </p>
           <label className="flex flex-col gap-2">
-            <span className="text-sm text-slate-400">Password</span>
+            <span className="text-sm text-slate-400">Project PIN or Admin Password</span>
             <input
               type="password"
               value={password}

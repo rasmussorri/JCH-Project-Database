@@ -8,11 +8,13 @@ import { Button } from '../ui/button';
 import { Calendar, Users, Code2, Info, Trash2 } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { PasswordDialog } from './PasswordDialog';
+import { UploadLink } from './UploadLink';
+import { sanitizeDescriptionHtml } from '../lib/sanitizeHtml';
 
 interface ProjectDetailProps {
   project: Project | null;
   onClose: () => void;
-  onDelete?: (projectId: string, password: string) => boolean;
+  onDelete?: (projectId: string, password: string) => Promise<boolean>;
 }
 
 const imageMap: Record<string, string> = {
@@ -60,11 +62,11 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
     setShowDeleteDialog(true);
   };
 
-  const handleConfirmDelete = (password: string) => {
+  const handleConfirmDelete = async (password: string) => {
     if (!onDelete) return;
 
     setPasswordError('');
-    const success = onDelete(project.id, password);
+    const success = await onDelete(project.id, password);
     
     if (success) {
       setShowDeleteDialog(false);
@@ -110,8 +112,13 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
           <div className="p-8 space-y-8">
             <DialogHeader>
               <DialogTitle className="text-slate-100">{project.title}</DialogTitle>
-              <DialogDescription className="text-slate-400">
-                {project.description}
+              <DialogDescription asChild>
+                <div
+                  className="text-slate-400 prose prose-invert prose-p:my-1 max-w-none [&_strong]:font-bold [&_em]:italic [&_u]:underline"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeDescriptionHtml(project.description_html ?? project.description),
+                  }}
+                />
               </DialogDescription>
             </DialogHeader>
 
@@ -122,7 +129,12 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
                   <Info className="w-5 h-5" />
                   <span>Project Description</span>
                 </div>
-                <p className="text-slate-400 pl-7">{project.description}</p>
+                <div
+                  className="text-slate-400 pl-7 prose prose-invert prose-p:my-1 max-w-none [&_strong]:font-bold [&_em]:italic [&_u]:underline"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeDescriptionHtml(project.description_html ?? project.description),
+                  }}
+                />
               </div>
 
               {/* Team Members */}
@@ -174,6 +186,9 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
                   })}
                 </p>
               </div>
+
+              {/* Upload Link */}
+              <UploadLink projectId={project.id} projectTitle={project.title} />
             </div>
           </div>
             </ScrollArea>
@@ -204,7 +219,6 @@ export function ProjectDetail({ project, onClose, onDelete }: ProjectDetailProps
       }}
       onConfirm={handleConfirmDelete}
       projectTitle={project.title}
-      hasProjectPassword={!!project.password}
       error={passwordError}
     />
     </>
