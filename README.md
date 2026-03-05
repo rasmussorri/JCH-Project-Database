@@ -1,6 +1,12 @@
 # JHC Project Database
 
-A project database for **LUT University’s Protolab J. Hyneman Center** (JHC). Track and showcase innovation and prototype projects: add projects with descriptions, team, technologies, status, and images; filter and view in a grid; manage uploads and deletion via PIN.
+This project database was built to showcase and track **LUT University’s Protolab J. Hyneman Center's** innovation & prototype projects. Usage: add projects with descriptions, team, technologies, status, and images; filter and view in a grid; manage uploads and deletion via PIN.
+
+The tech stack:
+- Cursor (Language models used: Auto, Opus 4.6, Sonnet 4.6)
+- ChatGPT 5.2 & 5.3 to engineer prompts for Cursor
+- Supabase
+- Vercel
 
 ---
 
@@ -20,7 +26,7 @@ A project database for **LUT University’s Protolab J. Hyneman Center** (JHC). 
 - **Frontend**  
   - Build: `cd frontend && npm install && npm run build` (output: `frontend/dist`).  
   - Deploy: from **`frontend/`** run `npx vercel --prod`, or connect the repo to Vercel with **Root Directory** set to `frontend`.  
-  - Set env vars in Vercel: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+  - **Required in Vercel:** In the project’s **Settings → Environment Variables**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` for the Production (and Preview) environment. Then trigger a new deployment so the build has access to them; otherwise the app will throw “Missing Supabase env vars” in the browser.
 
 - **Supabase Edge Functions**  
   Deploy from the **project root** (parent of `supabase/`):

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Project, CreateProjectPayload } from '../types';
 import * as projectService from '../services/projectService';
+import { supabase } from '../../../lib/supabaseClient';
 
 export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -30,6 +31,24 @@ export function useProjects() {
 
   useEffect(() => {
     fetchProjects();
+  }, [fetchProjects]);
+
+  // Refetch projects when a new image is added (e.g. from upload page) so cards update without manual refresh
+  useEffect(() => {
+    const channel = supabase
+      .channel('project-images-changes')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'project_images' },
+        () => {
+          fetchProjects();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchProjects]);
 
   const filteredProjects = useMemo(
