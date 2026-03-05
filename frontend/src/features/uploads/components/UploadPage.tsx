@@ -99,7 +99,7 @@ export function UploadPage() {
       setPreview(null);
     } catch (err) {
       console.error('Upload error:', err);
-      setError('Kuvien lähettäminen epäonnistui. Yritä uudelleen.');
+      setError('Upload failed. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -119,10 +119,10 @@ export function UploadPage() {
           </Button>
           <p className="text-xs text-slate-500 mb-1">JHC Project Database</p>
           <h1 className="text-2xl font-semibold text-slate-100 mb-2">
-            Lähetä kuvia
+            Upload images
           </h1>
           <p className="text-slate-400">
-            Valitse kuva ja lataa se projektiin.
+            Select an image and upload it to the project.
           </p>
         </div>
 
@@ -143,17 +143,17 @@ export function UploadPage() {
               disabled={uploading || uploaded}
             >
               <Upload className="w-5 h-5 mr-2" />
-              Valitse kuva
+              Select image
             </Button>
             <p className="text-xs text-slate-500 mt-2 text-center">
-              Voit ottaa kuvan suoraan kameralla
+              You can also take a photo directly with your camera
             </p>
           </div>
 
           {preview && selectedFile && (
             <div className="space-y-4">
               <h3 className="text-slate-300 font-medium">
-                Valittu kuva
+                Selected image
               </h3>
               <div className="grid grid-cols-1 gap-4">
                 <div className="relative group aspect-square rounded-lg overflow-hidden bg-slate-800">
@@ -199,12 +199,12 @@ export function UploadPage() {
               {uploading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Lähetetään...
+                  Uploading...
                 </>
               ) : (
                 <>
                   <Upload className="w-4 h-4 mr-2" />
-                  Lähetä kuva
+                  Upload image
                 </>
               )}
             </Button>

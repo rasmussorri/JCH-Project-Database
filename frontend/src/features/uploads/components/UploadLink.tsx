@@ -30,8 +30,8 @@ export function UploadLink({ projectId, projectTitle }: UploadLinkProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Lähetä kuvia projektiin: ${projectTitle}`,
-          text: `Lähetä kuvia projektiin ${projectTitle}`,
+          title: `Upload images to project: ${projectTitle}`,
+          text: `Upload images to project ${projectTitle}`,
           url: uploadUrl,
         });
       } catch {
@@ -70,10 +70,10 @@ export function UploadLink({ projectId, projectTitle }: UploadLinkProps) {
       <div className="space-y-2">
         <h3 className="text-slate-200 font-semibold flex items-center gap-2">
           <Share2 className="w-5 h-5" />
-          Lähetä kuvia puhelimesta
+          Upload images from phone
         </h3>
         <p className="text-sm text-slate-400">
-          Luo QR-koodi syöttämällä projektin PIN-koodi tai ylläpitosalasana.
+          Generate a QR code by entering the project PIN or admin password.
         </p>
       </div>
 
