@@ -1,4 +1,3 @@
-// Deno is provided by the Supabase Edge Runtime (not Node). Declare for IDE type-checking.
 declare const Deno: {
   serve: (handler: (req: Request) => Promise<Response> | Response) => void;
   env: { get: (key: string) => string | undefined };
@@ -6,34 +5,15 @@ declare const Deno: {
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import bcrypt from "https://esm.sh/bcryptjs@2.4.3";
+import { handleCorsOptions, json } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Max-Age": "86400",
-};
-
-function json(status: number, body: unknown) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      ...corsHeaders,
-    },
-  });
+interface DeleteBody {
+  projectId: string;
+  password: string;
 }
 
-type DeleteBody = { projectId: string; password: string };
-
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Length": "2" },
-    });
-  }
+  if (req.method === "OPTIONS") return handleCorsOptions();
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
 
   try {
@@ -62,20 +42,24 @@ Deno.serve(async (req) => {
 
     const isAdmin = body.password === ADMIN_PASSWORD;
     const isPinOk = bcrypt.compareSync(body.password, project.delete_pin_hash);
-    if (!isAdmin && !isPinOk) return json(401, { error: "Incorrect password" });
+    if (!isAdmin && !isPinOk) return json(403, { error: "Incorrect password" });
 
     const projectId = project.id;
 
-    // Remove storage files first (bucket: project-images)
     const { data: images } = await supabase
       .from("project_images")
       .select("storage_path")
       .eq("project_id", projectId);
+
     if (images?.length) {
-      await supabase.storage.from("project-images").remove(images.map((i) => i.storage_path));
+      const { error: storageErr } = await supabase.storage
+        .from("project-images")
+        .remove(images.map((i) => i.storage_path));
+      if (storageErr) {
+        console.error("Failed to remove storage files:", storageErr.message);
+      }
     }
 
-    // Delete child rows (schema has no ON DELETE CASCADE)
     await supabase.from("upload_sessions").delete().eq("project_id", projectId);
     await supabase.from("project_images").delete().eq("project_id", projectId);
     await supabase.from("project_members").delete().eq("project_id", projectId);

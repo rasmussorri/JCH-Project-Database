@@ -2,9 +2,16 @@ import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 import { Upload, X, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from '../ui/button';
-import { ImageWithFallback } from '../figma/ImageWithFallback';
-import { supabase } from '../lib/supabaseClient';
+import { Button } from '../../../ui/button';
+import { ImageWithFallback } from '../../../components/ImageWithFallback';
+import { signUpload } from '../services/uploadService';
+
+function getFileExtension(file: File): string {
+  const fromName = file.name.split('.').pop();
+  if (fromName) return fromName.toLowerCase();
+  const fromType = file.type.split('/').pop();
+  return fromType ? fromType.toLowerCase() : 'jpg';
+}
 
 export function UploadPage() {
   const { token } = useParams();
@@ -60,13 +67,6 @@ export function UploadPage() {
     setPreview(null);
   };
 
-  const getFileExtension = (file: File) => {
-    const fromName = file.name.split('.').pop();
-    if (fromName) return fromName.toLowerCase();
-    const fromType = file.type.split('/').pop();
-    return fromType ? fromType.toLowerCase() : 'jpg';
-  };
-
   const handleUpload = async () => {
     if (!selectedFile || !token) return;
 
@@ -75,25 +75,11 @@ export function UploadPage() {
 
     try {
       const fileExt = getFileExtension(selectedFile);
-      const { data, error: invokeError } = await supabase.functions.invoke(
-        'sign-upload',
-        {
-          body: {
-            token,
-            fileExt,
-            contentType: selectedFile.type || 'image/jpeg',
-          },
-        },
+      const signedUrl = await signUpload(
+        token,
+        fileExt,
+        selectedFile.type || 'image/jpeg',
       );
-
-      if (invokeError) {
-        throw invokeError;
-      }
-
-      const signedUrl = (data as { signedUrl?: string } | null)?.signedUrl;
-      if (!signedUrl) {
-        throw new Error('Missing signed URL');
-      }
 
       const response = await fetch(signedUrl, {
         method: 'PUT',
@@ -122,7 +108,6 @@ export function UploadPage() {
   return (
     <div className="min-h-screen bg-slate-950 p-4">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="mb-6">
           <Button
             variant="ghost"
@@ -141,9 +126,7 @@ export function UploadPage() {
           </p>
         </div>
 
-        {/* Upload Area */}
         <div className="bg-slate-900 rounded-lg border border-slate-800 p-6 space-y-6">
-          {/* File Input */}
           <div>
             <input
               ref={fileInputRef}
@@ -167,7 +150,6 @@ export function UploadPage() {
             </p>
           </div>
 
-          {/* Preview Grid */}
           {preview && selectedFile && (
             <div className="space-y-4">
               <h3 className="text-slate-300 font-medium">
@@ -195,14 +177,12 @@ export function UploadPage() {
             </div>
           )}
 
-          {/* Error Message */}
           {error && (
             <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg text-red-400 text-sm">
               {error}
             </div>
           )}
 
-          {/* Success Message */}
           {uploaded && (
             <div className="p-4 bg-green-900/20 border border-green-800 rounded-lg text-green-400 text-sm flex items-center gap-2">
               <CheckCircle className="w-5 h-5" />
@@ -210,7 +190,6 @@ export function UploadPage() {
             </div>
           )}
 
-          {/* Upload Button */}
           {selectedFile && !uploaded && (
             <Button
               onClick={handleUpload}
@@ -235,4 +214,3 @@ export function UploadPage() {
     </div>
   );
 }
-

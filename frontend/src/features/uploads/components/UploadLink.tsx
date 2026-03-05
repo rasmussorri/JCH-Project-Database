@@ -1,8 +1,8 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, Share2, Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '../ui/button';
-import { supabase } from '../lib/supabaseClient';
+import { Button } from '../../../ui/button';
+import { createUploadSession } from '../services/uploadService';
 
 interface UploadLinkProps {
   projectId: string;
@@ -34,12 +34,10 @@ export function UploadLink({ projectId, projectTitle }: UploadLinkProps) {
           text: `Lähetä kuvia projektiin ${projectTitle}`,
           url: uploadUrl,
         });
-      } catch (err) {
-        // User cancelled or error occurred
+      } catch {
         console.log('Share cancelled or failed');
       }
     } else {
-      // Fallback to copy
       handleCopy();
     }
   };
@@ -53,32 +51,18 @@ export function UploadLink({ projectId, projectTitle }: UploadLinkProps) {
     setLoading(true);
     setError('');
 
-    const { data, error: invokeError } = await supabase.functions.invoke(
-      'create-upload-session',
-      {
-        body: {
-          projectId,
-          password: password.trim(),
-          appBaseUrl: window.location.origin,
-        },
-      },
-    );
-
-    if (invokeError) {
-      setError('Failed to create upload link. Please check the password.');
+    try {
+      const url = await createUploadSession(
+        projectId,
+        password,
+        window.location.origin,
+      );
+      setUploadUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const nextUrl = (data as { uploadUrl?: string } | null)?.uploadUrl;
-    if (!nextUrl) {
-      setError('Upload link was not returned. Please try again.');
-      setLoading(false);
-      return;
-    }
-
-    setUploadUrl(nextUrl);
-    setLoading(false);
   };
 
   return (
@@ -132,7 +116,6 @@ export function UploadLink({ projectId, projectTitle }: UploadLinkProps) {
 
       {uploadUrl && (
         <div className="flex flex-col items-center gap-4">
-          {/* QR Code */}
           <div className="p-4 bg-white rounded-lg">
             <QRCodeSVG
               value={uploadUrl}
@@ -142,7 +125,6 @@ export function UploadLink({ projectId, projectTitle }: UploadLinkProps) {
             />
           </div>
 
-          {/* Link */}
           <div className="w-full space-y-2">
             <div className="flex items-center gap-2 p-3 bg-slate-900 rounded-lg border border-slate-700">
               <input
@@ -165,7 +147,6 @@ export function UploadLink({ projectId, projectTitle }: UploadLinkProps) {
               </Button>
             </div>
 
-            {/* Share button for mobile */}
             {'share' in navigator && typeof navigator.share === 'function' && (
               <Button
                 variant="outline"
@@ -182,4 +163,3 @@ export function UploadLink({ projectId, projectTitle }: UploadLinkProps) {
     </div>
   );
 }
-

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 
-import type { CreateProjectPayload, Project } from '../types/project';
-import { RichTextEditor } from './RichTextEditor';
-import { stripHtml } from '../lib/sanitizeHtml';
+import type { CreateProjectPayload, Project } from '../types';
+import { getInitials } from '../../../utils/formatting';
+import { RichTextEditor } from '../../../components/RichTextEditor';
+import { stripHtml } from '../../../lib/sanitizeHtml';
 import {
   Dialog,
   DialogContent,
@@ -11,9 +12,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../ui/dialog';
-import { Button } from '../ui/button';
-import { ScrollArea } from '../ui/scroll-area';
+} from '../../../ui/dialog';
+import { Button } from '../../../ui/button';
+import { ScrollArea } from '../../../ui/scroll-area';
 
 interface AddProjectDialogProps {
   onCreate: (payload: CreateProjectPayload) => Promise<void>;
@@ -78,14 +79,6 @@ export function AddProjectDialog({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const getInitials = (name: string) =>
-    name
-      .split(' ')
-      .filter(Boolean)
-      .map((part) => part[0])
-      .join('')
-      .toUpperCase();
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting) return;
@@ -109,9 +102,10 @@ export function AddProjectDialog({
       .filter(Boolean);
 
     try {
+      const descriptionHtml = (form.descriptionHtml ?? '').trim() || '<p></p>';
       await onCreate({
         title: form.title.trim(),
-        description_html: form.descriptionHtml.trim() || '<p></p>',
+        description_html: descriptionHtml,
         category: form.category.trim() || 'Uncategorized',
         status: form.status,
         startedAt: form.startDate,
@@ -181,7 +175,7 @@ export function AddProjectDialog({
               </label>
             </div>
 
-            <label className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
               <span className="text-sm text-slate-400">Description *</span>
               <RichTextEditor
                 value={form.descriptionHtml}
@@ -189,7 +183,7 @@ export function AddProjectDialog({
                 placeholder="Describe the project goals and outcomes..."
                 minHeight="120px"
               />
-            </label>
+            </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <label className="flex flex-col gap-2">
@@ -291,4 +285,3 @@ export function AddProjectDialog({
     </Dialog>
   );
 }
-

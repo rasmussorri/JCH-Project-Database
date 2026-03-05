@@ -1,4 +1,3 @@
-// Deno is provided by the Supabase Edge Runtime (not Node). Declare for IDE type-checking.
 declare const Deno: {
   serve: (handler: (req: Request) => Promise<Response> | Response) => void;
   env: { get: (key: string) => string | undefined };
@@ -6,43 +5,21 @@ declare const Deno: {
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import bcrypt from "https://esm.sh/bcryptjs@2.4.3";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Max-Age": "86400",
-};
-
-function json(status: number, body: unknown) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      ...corsHeaders,
-    },
-  });
-}
+import { handleCorsOptions, json } from "../_shared/cors.ts";
 
 function randomToken(byteLen = 24) {
   const bytes = crypto.getRandomValues(new Uint8Array(byteLen));
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-type Body = {
+interface CreateUploadSessionBody {
   projectId: string;
-  password: string; // project PIN or admin password
-  appBaseUrl: string; // e.g. https://yourapp.com or http://localhost:5173
-};
+  password: string;
+  appBaseUrl: string;
+}
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Length": "2" },
-    });
-  }
+  if (req.method === "OPTIONS") return handleCorsOptions();
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
 
   try {
@@ -54,7 +31,7 @@ Deno.serve(async (req) => {
     if (!SUPABASE_URL || !SERVICE_KEY) return json(500, { error: "Missing Supabase env vars" });
     if (!ADMIN_PASSWORD || ADMIN_PASSWORD.length < 8) return json(500, { error: "ADMIN_PASSWORD not set" });
 
-    const body = (await req.json()) as Body;
+    const body = (await req.json()) as CreateUploadSessionBody;
     if (!body?.projectId) return json(400, { error: "Missing projectId" });
     if (!body?.password) return json(400, { error: "Missing password" });
     if (!body?.appBaseUrl) return json(400, { error: "Missing appBaseUrl" });

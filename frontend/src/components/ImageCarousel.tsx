@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { ImageWithFallback } from '../figma/ImageWithFallback';
+import { ImageWithFallback } from './ImageWithFallback';
 import { Button } from '../ui/button';
 
 interface ImageCarouselProps {

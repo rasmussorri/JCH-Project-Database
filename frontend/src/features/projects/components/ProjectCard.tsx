@@ -1,47 +1,20 @@
-import type { Project } from '../types/project';
-import { stripHtml } from '../lib/sanitizeHtml';
-import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Avatar, AvatarFallback } from '../ui/avatar';
-import { ImageCarousel } from './ImageCarousel';
+import type { Project } from '../types';
+import { stripHtml } from '../../../lib/sanitizeHtml';
+import { getInitials } from '../../../utils/formatting';
+import { statusColors, categoryColors } from '../constants';
+import { Card, CardContent, CardFooter, CardHeader } from '../../../ui/card';
+import { Badge } from '../../../ui/badge';
+import { Avatar, AvatarFallback } from '../../../ui/avatar';
+import { ImageCarousel } from '../../../components/ImageCarousel';
 import { Calendar, Users } from 'lucide-react';
 
 interface ProjectCardProps {
   project: Project;
-  imageUrl?: string;
-  imageUrls?: string[];
+  images: string[];
   onClick: () => void;
 }
 
-const statusColors = {
-  'In Progress': 'bg-blue-600/90 text-blue-100 hover:bg-blue-600/90',
-  'Testing': 'bg-amber-600/90 text-amber-100 hover:bg-amber-600/90',
-  'Completed': 'bg-green-600/90 text-green-100 hover:bg-green-600/90',
-};
-
-const categoryColors = {
-  'IoT': 'bg-purple-600/90 text-purple-100 hover:bg-purple-600/90',
-  'AR/VR': 'bg-pink-600/90 text-pink-100 hover:bg-pink-600/90',
-  'Robotics': 'bg-cyan-600/90 text-cyan-100 hover:bg-cyan-600/90',
-  'AI/ML': 'bg-indigo-600/90 text-indigo-100 hover:bg-indigo-600/90',
-};
-
-export function ProjectCard({ project, imageUrl, imageUrls, onClick }: ProjectCardProps) {
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
-  // Determine which images to use - prioritize imageUrls array, fallback to imageUrl
-  const images: string[] = imageUrls && imageUrls.length > 0 
-    ? imageUrls 
-    : imageUrl 
-      ? [imageUrl] 
-      : [];
-
+export function ProjectCard({ project, images, onClick }: ProjectCardProps) {
   return (
     <Card 
       className="overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] touch-manipulation bg-slate-900/90 border-slate-800"
@@ -49,7 +22,7 @@ export function ProjectCard({ project, imageUrl, imageUrls, onClick }: ProjectCa
     >
       <div className="relative h-56 overflow-hidden bg-slate-800">
         <ImageCarousel images={images} alt={project.title} />
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-4 left-4 z-10">
           <Badge className={statusColors[project.status]}>
             {project.status}
           </Badge>
@@ -59,7 +32,7 @@ export function ProjectCard({ project, imageUrl, imageUrls, onClick }: ProjectCa
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3 mb-2">
           <h3 className="text-slate-100 flex-1 text-base font-semibold line-clamp-1">{project.title}</h3>
-          <Badge variant="outline" className={`${categoryColors[project.category as keyof typeof categoryColors]} border-0 flex-shrink-0`}>
+          <Badge variant="outline" className={`${categoryColors[project.category] ?? ''} border-0 flex-shrink-0 text-white`}>
             {project.category}
           </Badge>
         </div>

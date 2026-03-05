@@ -1,4 +1,3 @@
-// Deno is provided by the Supabase Edge Runtime (not Node). Declare for IDE type-checking.
 declare const Deno: {
   serve: (handler: (req: Request) => Promise<Response> | Response) => void;
   env: { get: (key: string) => string | undefined };
@@ -6,50 +5,35 @@ declare const Deno: {
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import bcrypt from "https://esm.sh/bcryptjs@2.4.3";
+import { handleCorsOptions, json } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Max-Age": "86400",
-};
+const ALLOWED_STATUSES = ["In Progress", "Testing", "Completed"] as const;
 
-function json(status: number, body: unknown) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      ...corsHeaders,
-    },
-  });
+interface CreateProjectBody {
+  title: string;
+  deletePin: string;
+  description?: string;
+  description_html?: string;
+  category?: string;
+  status?: string;
+  startedAt?: string;
+  members?: Array<{ name: string; initials?: string }>;
+  tech?: string[];
 }
 
 Deno.serve(async (req) => {
-  // CORS preflight: return 200 + CORS headers (204 can be treated as non-ok by some gateways)
-  if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        "Content-Length": "2",
-      },
-    });
-  }
-
+  if (req.method === "OPTIONS") return handleCorsOptions();
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
 
-  const ALLOWED_STATUSES = ["In Progress", "Testing", "Completed"] as const;
-
   try {
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const url = Deno.env.get("SUPABASE_URL");
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !key) return json(500, { error: "Missing Supabase env vars" });
 
-    const body = await req.json();
+    const supabase = createClient(url, key);
+    const body: CreateProjectBody = await req.json();
 
-    if (!body.title || !body.deletePin) {
+    if (!body.title?.trim() || !body.deletePin) {
       return json(400, { error: "Missing title or deletePin" });
     }
 
@@ -58,7 +42,8 @@ Deno.serve(async (req) => {
         ? body.category.trim()
         : "Uncategorized";
     const status =
-      typeof body.status === "string" && ALLOWED_STATUSES.includes(body.status as typeof ALLOWED_STATUSES[number])
+      typeof body.status === "string" &&
+      ALLOWED_STATUSES.includes(body.status as (typeof ALLOWED_STATUSES)[number])
         ? body.status
         : "In Progress";
 
@@ -77,15 +62,21 @@ Deno.serve(async (req) => {
 
     const pinHash = bcrypt.hashSync(body.deletePin, 10);
 
-    const descriptionHtml =
-      body.description_html != null ? String(body.description_html).trim() : "";
+    const rawDescription =
+      body.description_html != null
+        ? String(body.description_html).trim()
+        : body.description != null
+          ? String(body.description).trim()
+          : "";
+    const descriptionValue = rawDescription || "";
+    const descriptionHtmlValue = rawDescription || null;
 
     const { data, error } = await supabase
       .from("projects")
       .insert({
         title: String(body.title).trim(),
-        description: descriptionHtml || "",
-        description_html: descriptionHtml || null,
+        description: descriptionValue,
+        description_html: descriptionHtmlValue,
         category,
         status,
         started_at: startedAt,
@@ -96,7 +87,51 @@ Deno.serve(async (req) => {
 
     if (error) return json(500, { error: error.message });
 
-    return json(200, { projectId: data.id });
+    const projectId = data.id;
+
+    const members = Array.isArray(body.members) ? body.members : [];
+    if (members.length > 0) {
+      const memberRows = members
+        .filter((m): m is { name: string; initials?: string } =>
+          !!m && typeof m.name === "string",
+        )
+        .map((m) => ({
+          project_id: projectId,
+          name: String(m.name).trim(),
+          initials:
+            typeof m.initials === "string"
+              ? m.initials.trim()
+              : String(m.name)
+                  .trim()
+                  .split(" ")
+                  .map((p) => p[0])
+                  .join("")
+                  .toUpperCase(),
+        }));
+      if (memberRows.length > 0) {
+        const { error: membersErr } = await supabase
+          .from("project_members")
+          .insert(memberRows);
+        if (membersErr)
+          return json(500, { error: "Failed to save team members: " + membersErr.message });
+      }
+    }
+
+    const tech = Array.isArray(body.tech) ? body.tech : [];
+    if (tech.length > 0) {
+      const techRows = tech
+        .filter((t): t is string => typeof t === "string" && t.trim() !== "")
+        .map((t) => ({ project_id: projectId, tech: t.trim() }));
+      if (techRows.length > 0) {
+        const { error: techErr } = await supabase
+          .from("project_tech")
+          .insert(techRows);
+        if (techErr)
+          return json(500, { error: "Failed to save technologies: " + techErr.message });
+      }
+    }
+
+    return json(200, { projectId });
   } catch (e) {
     return json(500, { error: String(e) });
   }

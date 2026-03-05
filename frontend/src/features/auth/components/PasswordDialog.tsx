@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../ui/dialog';
+import { Button } from '../../../ui/button';
 import { Lock } from 'lucide-react';
 
 interface PasswordDialogProps {
@@ -108,4 +108,3 @@ export function PasswordDialog({
     </Dialog>
   );
 }
-

@@ -1,5 +1,4 @@
-import type { Project } from '../types/project';
-import { Button } from '../ui/button';
+import type { Project } from '../types';
 import { Filter } from 'lucide-react';
 
 interface FilterBarProps {
@@ -10,6 +9,9 @@ interface FilterBarProps {
   projects: Project[];
   addProjectSlot?: React.ReactNode;
 }
+
+const selectClassName =
+  'min-w-[140px] rounded-md border border-white/30 bg-slate-900 px-3 py-2 text-sm text-white focus:border-white focus:outline-none focus:ring-2 focus:ring-white/30 touch-manipulation cursor-pointer [&>option]:bg-slate-800 [&>option]:text-white';
 
 export function FilterBar({
   selectedCategory,
@@ -30,39 +32,41 @@ export function FilterBar({
           <span className="text-slate-300">Filter Projects</span>
         </div>
         <div className="flex flex-wrap items-center gap-6 flex-1 min-w-0">
-          {/* Category: label and buttons in a row, vertically centered */}
           <div className="flex flex-wrap items-center gap-3">
-            <p className="text-slate-400 text-sm shrink-0">Category</p>
-            <div className="flex flex-wrap gap-2">
+            <label htmlFor="filter-category" className="text-slate-400 text-sm shrink-0">
+              Category
+            </label>
+            <select
+              id="filter-category"
+              value={selectedCategory}
+              onChange={(e) => onCategoryChange(e.target.value)}
+              className={selectClassName}
+              aria-label="Filter by category"
+            >
               {categories.map((category) => (
-                <Button
-                  key={category}
-                  onClick={() => onCategoryChange(category)}
-                  variant="outline"
-                  size="sm"
-                  className={`min-w-[80px] touch-manipulation border-white text-white hover:bg-white/10 hover:text-white ${selectedCategory === category ? 'bg-white text-slate-900 hover:bg-white hover:text-slate-900' : ''}`}
-                >
+                <option key={category} value={category}>
                   {category}
-                </Button>
+                </option>
               ))}
-            </div>
+            </select>
           </div>
-          {/* Status: label and buttons in a row, vertically centered */}
           <div className="flex flex-wrap items-center gap-3">
-            <p className="text-slate-400 text-sm shrink-0">Status</p>
-            <div className="flex flex-wrap gap-2">
+            <label htmlFor="filter-status" className="text-slate-400 text-sm shrink-0">
+              Status
+            </label>
+            <select
+              id="filter-status"
+              value={selectedStatus}
+              onChange={(e) => onStatusChange(e.target.value)}
+              className={selectClassName}
+              aria-label="Filter by status"
+            >
               {statuses.map((status) => (
-                <Button
-                  key={status}
-                  onClick={() => onStatusChange(status)}
-                  variant="outline"
-                  size="sm"
-                  className={`min-w-[80px] touch-manipulation border-white text-white hover:bg-white/10 hover:text-white ${selectedStatus === status ? 'bg-white text-slate-900 hover:bg-white hover:text-slate-900' : ''}`}
-                >
+                <option key={status} value={status}>
                   {status}
-                </Button>
+                </option>
               ))}
-            </div>
+            </select>
           </div>
         </div>
         <div className="shrink-0">{addProjectSlot}</div>
