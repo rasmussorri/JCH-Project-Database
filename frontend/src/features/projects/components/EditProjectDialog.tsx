@@ -7,6 +7,7 @@ import { getInitials } from '../../../utils/formatting';
 import { RichTextEditor } from '../../../components/RichTextEditor';
 import { stripHtml } from '../../../lib/sanitizeHtml';
 import * as projectService from '../services/projectService';
+import { useApiStatus } from '../../../contexts/ApiStatusContext';
 import {
   Dialog,
   DialogContent,
@@ -137,6 +138,8 @@ export function EditProjectDialog({
     }
   };
 
+  const apiStatus = useApiStatus();
+
   const handleGenerateAI = async () => {
     setAiGenerating(true);
     try {
@@ -156,7 +159,11 @@ export function EditProjectDialog({
       setAiPreview(html);
     } catch (err) {
       console.error('AI generation failed:', err);
-      setError('AI description generation failed. Please try again.');
+      const message = err instanceof Error ? err.message : '';
+      if (message.includes('API credits') || message.includes('credits exhausted')) {
+        apiStatus?.setApiCreditsExhausted(true);
+      }
+      setError(message || 'AI description generation failed. Please try again.');
     } finally {
       setAiGenerating(false);
     }

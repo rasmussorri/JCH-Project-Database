@@ -73,6 +73,15 @@ Deno.serve(async (req) => {
     if (!res.ok) {
       const errText = await res.text();
       console.error("OpenAI error:", res.status, errText);
+      const isQuota =
+        res.status === 429 ||
+        /quota|insufficient_quota|exceeded.*quota|billing/i.test(errText);
+      if (isQuota) {
+        return json(402, {
+          error: "API_CREDITS_EXHAUSTED",
+          message: "API credits exhausted. AI descriptions are temporarily unavailable.",
+        });
+      }
       return json(502, { error: "AI service unavailable" });
     }
 

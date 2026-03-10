@@ -160,6 +160,9 @@ export async function deleteProjectImage(
   if (response?.error) throw new Error(response.error);
 }
 
+export const API_CREDITS_EXHAUSTED_MESSAGE =
+  'API credits exhausted. AI descriptions are temporarily unavailable.';
+
 export async function generateDescription(
   payload: GenerateDescriptionPayload,
 ): Promise<string> {
@@ -168,11 +171,19 @@ export async function generateDescription(
     { body: payload },
   );
 
+  const response = data as {
+    descriptionHtml?: string;
+    error?: string;
+    message?: string;
+  } | null;
+
+  if (response?.error === 'API_CREDITS_EXHAUSTED') {
+    throw new Error(response.message ?? API_CREDITS_EXHAUSTED_MESSAGE);
+  }
+
   if (error) throw new Error('AI description generation failed.');
 
-  const response = data as { descriptionHtml?: string } | null;
-  if (!response?.descriptionHtml)
-    throw new Error('Empty AI response.');
+  if (!response?.descriptionHtml) throw new Error('Empty AI response.');
 
   return response.descriptionHtml;
 }
