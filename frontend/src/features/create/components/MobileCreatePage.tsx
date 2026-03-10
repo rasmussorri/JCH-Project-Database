@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import {
@@ -68,17 +68,6 @@ export function MobileCreatePage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const prevBodyBg = document.body.style.backgroundColor;
-    const prevHtmlBg = document.documentElement.style.backgroundColor;
-    document.body.style.backgroundColor = '#020617';
-    document.documentElement.style.backgroundColor = '#020617';
-    return () => {
-      document.body.style.backgroundColor = prevBodyBg;
-      document.documentElement.style.backgroundColor = prevHtmlBg;
-    };
-  }, []);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -276,14 +265,14 @@ export function MobileCreatePage() {
               </select>
             </label>
 
-            <label className="flex flex-col gap-1.5">
+            <label className="flex flex-col gap-1.5 overflow-hidden">
               <span className={labelClass}>Start Date</span>
               <input
                 type="date"
                 name="startDate"
                 value={form.startDate}
                 onChange={handleChange}
-                className={`${inputClass} min-w-0`}
+                className={`${inputClass} min-w-0 max-w-full`}
               />
             </label>
 

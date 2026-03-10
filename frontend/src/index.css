@@ -189,6 +189,11 @@
   }
 }
 
+html,
+body {
+  background-color: #020617;
+}
+
 html {
   font-size: var(--font-size);
 }
