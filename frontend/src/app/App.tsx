@@ -9,6 +9,7 @@ import { CreateFromPhoneDialog } from "../features/projects/components/CreateFro
 import { UploadPage } from "../features/uploads/components/UploadPage";
 import { MobileCreatePage } from "../features/create/components/MobileCreatePage";
 import { useProjects } from "../features/projects/hooks/useProjects";
+import { PageContainer } from "../components/layout/PageContainer";
 import { Button } from "../ui/button";
 import { Info, X } from "lucide-react";
 
@@ -127,7 +128,6 @@ function HomeWithBanner({
 
   return (
     <div className="min-h-screen bg-slate-950 relative">
-            {/* Header with JHC Banner */}
             <header
               className={`relative border-b border-slate-800 sticky top-0 z-10 shadow-xl overflow-hidden transition-transform duration-300 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
             >
@@ -139,31 +139,31 @@ function HomeWithBanner({
 
               <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]" />
 
-              <div className="max-w-[1800px] mx-auto px-12 py-8 relative z-10">
+              <PageContainer className="py-4 sm:py-6 lg:py-8 relative z-10">
                 <div className="flex bg-black border-0 overflow-hidden rounded-sm shadow-2xl w-fit max-w-full">
                   <div
                     className="w-2 shrink-0"
                     style={{ backgroundColor: "#009933" }}
                     aria-hidden
                   />
-                  <div className="py-6 pl-6 pr-8">
-                    <h1 className="text-white text-xl sm:text-2xl font-bold tracking-tight uppercase">
+                  <div className="py-3 px-4 sm:py-6 sm:pl-6 sm:pr-8">
+                    <h1 className="text-white text-lg sm:text-xl lg:text-2xl font-bold tracking-tight uppercase">
                       JHC Protolab Project Database
                     </h1>
                   </div>
                 </div>
-              </div>
+              </PageContainer>
             </header>
 
-            <main className="max-w-[1800px] mx-auto px-12 py-6">
+            <PageContainer as="main" className="py-4 sm:py-6">
               {loadError && (
-                <div className="mb-6 rounded-lg border border-red-800 bg-red-900/20 p-4 text-sm text-red-400">
+                <div className="mb-4 sm:mb-6 rounded-lg border border-red-800 bg-red-900/20 p-3 sm:p-4 text-sm text-red-400">
                   {loadError}
                 </div>
               )}
 
               {apiStatus?.apiCreditsExhausted && (
-                <div className="mb-6 rounded-lg border border-amber-700 bg-amber-900/20 p-4 text-sm text-amber-200 flex items-center justify-between gap-4">
+                <div className="mb-4 sm:mb-6 rounded-lg border border-amber-700 bg-amber-900/20 p-3 sm:p-4 text-sm text-amber-200 flex items-center justify-between gap-3 sm:gap-4">
                   <span className="flex items-center gap-2">
                     <Info className="w-4 h-4 flex-shrink-0" />
                     API credits exhausted. AI-generated descriptions are temporarily unavailable. You can still add and edit projects with your own text.
@@ -226,11 +226,11 @@ function HomeWithBanner({
                   )}
                 </>
               )}
-            </main>
+            </PageContainer>
 
-            <footer className="max-w-[1800px] mx-auto px-12 py-8 mt-6 border-t border-slate-800">
-              <div className="flex flex-wrap items-center justify-between gap-6 text-sm text-slate-400">
-                <div className="flex flex-wrap items-center gap-6">
+            <PageContainer as="footer" className="py-6 sm:py-8 mt-4 sm:mt-6 border-t border-slate-800">
+              <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-6 text-sm text-slate-400">
+                <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                   <a
                     href="https://www.lut.fi/en/protolab-j-hyneman-center"
                     target="_blank"
@@ -244,7 +244,7 @@ function HomeWithBanner({
                   </a>
                 </div>
               </div>
-            </footer>
+            </PageContainer>
 
             <ProjectDetail
               project={selectedProject}

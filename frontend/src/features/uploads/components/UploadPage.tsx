@@ -25,8 +25,8 @@ export function UploadPage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-slate-950 p-4 flex items-center justify-center">
-        <div className="max-w-2xl mx-auto text-center space-y-4">
+      <div className="min-h-screen bg-slate-950 px-4 py-4 sm:px-6 sm:py-6 flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center space-y-4">
           <h1 className="text-2xl font-semibold text-slate-100">
             Invalid upload link
           </h1>
@@ -106,7 +106,7 @@ export function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-4">
+    <div className="min-h-screen bg-slate-950 px-4 py-4 sm:px-6 sm:py-6">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <Button
@@ -126,7 +126,7 @@ export function UploadPage() {
           </p>
         </div>
 
-        <div className="bg-slate-900 rounded-lg border border-slate-800 p-6 space-y-6">
+        <div className="bg-slate-900 rounded-lg border border-slate-800 p-4 sm:p-6 space-y-4 sm:space-y-6">
           <div>
             <input
               ref={fileInputRef}

@@ -148,7 +148,7 @@ export function AddProjectDialog({
           + Add Project
         </Button>
       )}
-      <DialogContent className="max-w-3xl bg-slate-900 border-slate-800" aria-describedby="add-project-description">
+      <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-[calc(100%-2rem)] md:max-w-3xl bg-slate-900 border-slate-800" aria-describedby="add-project-description">
         <DialogHeader>
           <DialogTitle className="text-slate-100">Add New Project</DialogTitle>
           <DialogDescription id="add-project-description" className="sr-only">

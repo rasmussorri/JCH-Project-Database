@@ -20,7 +20,7 @@ export function ProjectCard({ project, images, onClick }: ProjectCardProps) {
       className="overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] touch-manipulation bg-slate-900/90 border-slate-800"
       onClick={onClick}
     >
-      <div className="relative h-56 overflow-hidden bg-slate-800">
+      <div className="relative h-40 sm:h-48 lg:h-56 overflow-hidden bg-slate-800">
         <ImageCarousel images={images} alt={project.title} />
         <div className="absolute top-4 left-4 z-10">
           <Badge className={statusColors[project.status]}>

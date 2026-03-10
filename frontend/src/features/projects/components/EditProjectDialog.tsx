@@ -199,7 +199,7 @@ export function EditProjectDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-3xl bg-slate-900 border-slate-800"
+        className="max-w-[calc(100%-1rem)] sm:max-w-[calc(100%-2rem)] md:max-w-3xl bg-slate-900 border-slate-800"
         aria-describedby="edit-project-description"
       >
         <DialogHeader>
@@ -398,7 +398,7 @@ export function EditProjectDialog({
             {imageStoragePaths.length > 0 && (
               <div className="space-y-3">
                 <span className="text-sm text-slate-400">Images</span>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {imageStoragePaths.map(({ url, storagePath }) => (
                     <div
                       key={storagePath}

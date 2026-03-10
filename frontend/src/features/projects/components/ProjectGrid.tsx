@@ -1,6 +1,7 @@
 import type { Project } from '../types';
 import { resolveProjectImages } from '../resolveProjectImages';
 import { ProjectCard } from './ProjectCard';
+import { ResponsiveGrid } from '../../../components/layout/ResponsiveGrid';
 
 interface ProjectGridProps {
   projects: Project[];
@@ -9,7 +10,7 @@ interface ProjectGridProps {
 
 export function ProjectGrid({ projects, onProjectClick }: ProjectGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+    <ResponsiveGrid>
       {projects.map((project) => (
         <ProjectCard
           key={project.id}
@@ -18,6 +19,6 @@ export function ProjectGrid({ projects, onProjectClick }: ProjectGridProps) {
           onClick={() => onProjectClick(project)}
         />
       ))}
-    </div>
+    </ResponsiveGrid>
   );
 }

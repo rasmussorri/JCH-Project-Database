@@ -178,9 +178,9 @@ export function MobileCreatePage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-slate-950 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 px-4 py-6 flex items-center justify-center">
         <div className="max-w-md mx-auto text-center space-y-4">
-          <h1 className="text-2xl font-semibold text-slate-100">Invalid link</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-100">Invalid link</h1>
           <p className="text-slate-400">This creation link is missing or invalid.</p>
         </div>
       </div>
@@ -189,10 +189,10 @@ export function MobileCreatePage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 px-4 py-6 flex items-center justify-center">
         <div className="max-w-md mx-auto text-center space-y-6">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
-          <h1 className="text-2xl font-semibold text-slate-100">Project created!</h1>
+          <CheckCircle className="w-14 h-14 sm:w-16 sm:h-16 text-green-500 mx-auto" />
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-100">Project created!</h1>
           <p className="text-slate-400">
             The project has been added to the database. You can close this page.
           </p>
@@ -207,7 +207,7 @@ export function MobileCreatePage() {
 
   return (
     <div className="min-h-screen bg-slate-950">
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-lg mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Header */}
         <div>
           <p className="text-xs text-slate-500 mb-1">JHC Project Database</p>
@@ -550,7 +550,7 @@ export function MobileCreatePage() {
                   <span className="text-xs text-slate-500 uppercase tracking-wide">
                     Images ({images.length})
                   </span>
-                  <div className="grid grid-cols-4 gap-2 mt-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
                     {images.map((img, i) => (
                       <div
                         key={i}

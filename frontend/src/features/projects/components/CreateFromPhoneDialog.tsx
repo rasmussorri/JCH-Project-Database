@@ -125,7 +125,7 @@ export function CreateFromPhoneDialog({
         + Add Project
       </Button>
       <DialogContent
-        className="max-w-md bg-slate-900 border-slate-800"
+        className="max-w-[calc(100%-1rem)] sm:max-w-md bg-slate-900 border-slate-800"
         aria-describedby="create-from-phone-desc"
       >
         <DialogHeader>
@@ -164,8 +164,8 @@ export function CreateFromPhoneDialog({
 
           {createUrl && !completed && (
             <>
-              <div className="p-4 bg-white rounded-xl">
-                <QRCodeSVG value={createUrl} size={260} level="M" includeMargin={false} />
+              <div className="p-3 sm:p-4 bg-white rounded-xl w-fit mx-auto">
+                <QRCodeSVG value={createUrl} size={220} level="M" includeMargin={false} className="w-[180px] h-[180px] sm:w-[220px] sm:h-[220px]" />
               </div>
 
               <div className="w-full flex items-center gap-2 p-3 bg-slate-800 rounded-lg border border-slate-700">
