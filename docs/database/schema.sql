@@ -7,10 +7,11 @@ CREATE TABLE public.projects (
   title text NOT NULL,
   description text NOT NULL DEFAULT ''::text,
   category text NOT NULL DEFAULT 'Uncategorized'::text,
-  status text NOT NULL DEFAULT 'In Progress'::text CHECK (status = ANY (ARRAY['In Progress'::text, 'Testing'::text, 'Completed'::text])),
+  status text NOT NULL DEFAULT 'In Progress'::text CHECK (status = ANY (ARRAY['In Progress'::text, 'Finished'::text, 'History'::text])),
   started_at date,
   delete_pin_hash text NOT NULL,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
+  contact text,
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT projects_pkey PRIMARY KEY (id)
 );
@@ -53,6 +54,18 @@ CREATE TABLE public.upload_sessions (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT upload_sessions_pkey PRIMARY KEY (id),
   CONSTRAINT upload_sessions_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id)
+);
+
+CREATE TABLE public.creation_sessions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  token text NOT NULL UNIQUE,
+  expires_at timestamptz NOT NULL,
+  completed_at timestamptz,        -- NULL until project is created
+  project_id uuid,                 -- Set when project is created
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT creation_sessions_pkey PRIMARY KEY (id),
+  CONSTRAINT creation_sessions_project_id_fkey
+    FOREIGN KEY (project_id) REFERENCES public.projects(id)
 );
 
 -- If projects already exists with the old category CHECK, run this in Supabase SQL Editor to allow any category:

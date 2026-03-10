@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ProjectGrid } from "../features/projects/components/ProjectGrid";
 import { ProjectDetail } from "../features/projects/components/ProjectDetail";
 import { FilterBar } from "../features/projects/components/FilterBar";
 import { AddProjectDialog } from "../features/projects/components/AddProjectDialog";
+import { CreateFromPhoneDialog } from "../features/projects/components/CreateFromPhoneDialog";
 import { UploadPage } from "../features/uploads/components/UploadPage";
+import { MobileCreatePage } from "../features/create/components/MobileCreatePage";
 import { useProjects } from "../features/projects/hooks/useProjects";
 
 const JHC_BACKGROUND =
@@ -24,10 +26,19 @@ export default function App() {
     projects,
     categories,
     handleCreateProject,
+    handleUpdateProject,
     handleDeleteProject,
+    fetchProjects,
   } = useProjects();
 
   const [showHeader, setShowHeader] = useState(true);
+  const [showDesktopFallback, setShowDesktopFallback] = useState(false);
+
+  const handlePhoneProjectCreated = useCallback(async () => {
+    await fetchProjects();
+    setFilteredCategory("All");
+    setFilteredStatus("All");
+  }, [fetchProjects, setFilteredCategory, setFilteredStatus]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -88,10 +99,21 @@ export default function App() {
                 onStatusChange={setFilteredStatus}
                 projects={projects}
                 addProjectSlot={
-                  <AddProjectDialog
-                    onCreate={handleCreateProject}
-                    existingCategories={categories}
-                  />
+                  <>
+                    <CreateFromPhoneDialog
+                      onProjectCreated={handlePhoneProjectCreated}
+                      onFallbackClick={() => setShowDesktopFallback(true)}
+                      existingCategories={categories}
+                    />
+                    {showDesktopFallback && (
+                      <AddProjectDialog
+                        onCreate={handleCreateProject}
+                        existingCategories={categories}
+                        externalOpen={showDesktopFallback}
+                        onExternalOpenChange={setShowDesktopFallback}
+                      />
+                    )}
+                  </>
                 }
               />
 
@@ -139,11 +161,13 @@ export default function App() {
               project={selectedProject}
               onClose={() => setSelectedProject(null)}
               onDelete={handleDeleteProject}
+              onUpdate={handleUpdateProject}
             />
           </div>
         }
       />
       <Route path="/upload/:token" element={<UploadPage />} />
+      <Route path="/create/:token" element={<MobileCreatePage />} />
     </Routes>
   );
 }

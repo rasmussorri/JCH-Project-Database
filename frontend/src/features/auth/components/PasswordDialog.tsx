@@ -9,6 +9,10 @@ interface PasswordDialogProps {
   onConfirm: (password: string) => void;
   projectTitle: string;
   error?: string;
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
+  variant?: 'destructive' | 'default';
 }
 
 export function PasswordDialog({
@@ -17,6 +21,10 @@ export function PasswordDialog({
   onConfirm,
   projectTitle,
   error: externalError,
+  title: customTitle,
+  description: customDescription,
+  confirmLabel,
+  variant = 'destructive',
 }: PasswordDialogProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -53,10 +61,10 @@ export function PasswordDialog({
         <DialogHeader>
           <DialogTitle className="text-slate-100 flex items-center gap-2">
             <Lock className="w-5 h-5" />
-            Confirm Deletion
+            {customTitle ?? 'Confirm Deletion'}
           </DialogTitle>
           <DialogDescription className="text-slate-400">
-            To delete <span className="font-semibold text-slate-300">{projectTitle}</span>, please enter the password.
+            {customDescription ?? (<>To delete <span className="font-semibold text-slate-300">{projectTitle}</span>, please enter the password.</>)}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -97,11 +105,11 @@ export function PasswordDialog({
             Cancel
           </Button>
           <Button
-            variant="destructive"
+            variant={variant === 'destructive' ? 'destructive' : 'default'}
             onClick={handleSubmit}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className={variant === 'destructive' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-cyan-600 hover:bg-cyan-500 text-white'}
           >
-            Delete
+            {confirmLabel ?? 'Delete'}
           </Button>
         </DialogFooter>
       </DialogContent>

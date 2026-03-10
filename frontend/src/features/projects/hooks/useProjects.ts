@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Project, CreateProjectPayload } from '../types';
+import type { Project, CreateProjectPayload, UpdateProjectPayload } from '../types';
 import * as projectService from '../services/projectService';
 import { supabase } from '../../../lib/supabaseClient';
 
@@ -90,6 +90,14 @@ export function useProjects() {
     [fetchProjects, selectedProject?.id],
   );
 
+  const handleUpdateProject = useCallback(
+    async (payload: UpdateProjectPayload) => {
+      await projectService.updateProject(payload);
+      await fetchProjects();
+    },
+    [fetchProjects],
+  );
+
   const categories = useMemo(
     () => [...new Set(projects.map((project) => project.category))],
     [projects],
@@ -107,7 +115,9 @@ export function useProjects() {
     loading,
     loadError,
     categories,
+    fetchProjects,
     handleCreateProject,
+    handleUpdateProject,
     handleDeleteProject,
   };
 }

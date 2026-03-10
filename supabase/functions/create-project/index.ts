@@ -7,7 +7,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import bcrypt from "https://esm.sh/bcryptjs@2.4.3";
 import { handleCorsOptions, json } from "../_shared/cors.ts";
 
-const ALLOWED_STATUSES = ["In Progress", "Testing", "Completed"] as const;
+const ALLOWED_STATUSES = ["In Progress", "Finished", "History"] as const;
 
 interface CreateProjectBody {
   title: string;
@@ -19,6 +19,7 @@ interface CreateProjectBody {
   startedAt?: string;
   members?: Array<{ name: string; initials?: string }>;
   tech?: string[];
+  contact?: string;
 }
 
 Deno.serve(async (req) => {
@@ -81,6 +82,7 @@ Deno.serve(async (req) => {
         status,
         started_at: startedAt,
         delete_pin_hash: pinHash,
+        contact: typeof body.contact === "string" ? body.contact.trim() || null : null,
       })
       .select("id")
       .single();

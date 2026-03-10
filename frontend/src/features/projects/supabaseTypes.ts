@@ -9,6 +9,7 @@ export interface SupabaseProject {
   category: string | null;
   status: Project['status'] | null;
   started_at: string | null;
+  contact: string | null;
   created_at: string | null;
   project_members?: Array<{ name: string | null; initials: string | null }>;
   project_tech?: Array<{ tech: string | null }>;

@@ -1,7 +1,7 @@
 export const statusColors: Record<string, string> = {
   'In Progress': 'bg-blue-600/90 text-blue-100 hover:bg-blue-600/90',
-  'Testing': 'bg-amber-600/90 text-amber-100 hover:bg-amber-600/90',
-  'Completed': 'bg-green-600/90 text-green-100 hover:bg-green-600/90',
+  'Finished': 'bg-green-600/90 text-green-100 hover:bg-green-600/90',
+  'History': 'bg-slate-600/90 text-slate-100 hover:bg-slate-600/90',
 };
 
 export const categoryColors: Record<string, string> = {

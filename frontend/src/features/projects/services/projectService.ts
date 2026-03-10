@@ -1,5 +1,13 @@
 import { supabase } from '../../../lib/supabaseClient';
-import type { CreateProjectPayload, Project } from '../types';
+import type {
+  CreateProjectPayload,
+  MobileCreateProjectPayload,
+  MobileCreateProjectResponse,
+  CreateCreationSessionResponse,
+  UpdateProjectPayload,
+  GenerateDescriptionPayload,
+  Project,
+} from '../types';
 import type { SupabaseProject } from '../supabaseTypes';
 
 function mapSupabaseProject(row: SupabaseProject): Project {
@@ -33,6 +41,7 @@ function mapSupabaseProject(row: SupabaseProject): Project {
       .filter(Boolean),
     imageUrl: imageUrls[0],
     imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
+    contact: row.contact ?? undefined,
   };
 }
 
@@ -40,7 +49,7 @@ export async function fetchProjects(): Promise<Project[]> {
   const { data, error } = await supabase
     .from('projects')
     .select(
-      `id,title,description,description_html,category,status,started_at,created_at,
+      `id,title,description,description_html,category,status,started_at,contact,created_at,
        project_members(name,initials),
        project_tech(tech),
        project_images(storage_path,created_at)`,
@@ -75,4 +84,91 @@ export async function deleteProject(
   if (error) {
     throw new Error(`Failed to delete project: ${error.message}`);
   }
+}
+
+export async function createCreationSession(
+  appBaseUrl: string,
+): Promise<CreateCreationSessionResponse> {
+  const { data, error } = await supabase.functions.invoke(
+    'create-creation-session',
+    { body: { appBaseUrl } },
+  );
+
+  if (error) throw new Error('Failed to create creation session.');
+
+  const response = data as CreateCreationSessionResponse | null;
+  if (!response?.token || !response?.createUrl)
+    throw new Error('Invalid creation session response.');
+
+  return response;
+}
+
+export async function createProjectWithAI(
+  payload: MobileCreateProjectPayload,
+): Promise<MobileCreateProjectResponse> {
+  const { data, error } = await supabase.functions.invoke(
+    'create-project-with-ai',
+    { body: payload },
+  );
+
+  if (error) {
+    const msg =
+      typeof error === 'object' && 'message' in error
+        ? (error as { message: string }).message
+        : String(error);
+    throw new Error(msg);
+  }
+
+  const response = data as MobileCreateProjectResponse | null;
+  if (!response?.projectId) throw new Error('Project creation failed.');
+
+  return response;
+}
+
+export async function updateProject(
+  payload: UpdateProjectPayload,
+): Promise<void> {
+  const { data, error } = await supabase.functions.invoke('update-project', {
+    body: payload,
+  });
+
+  if (error) {
+    throw new Error(`Failed to update project: ${error.message}`);
+  }
+
+  const response = data as { success?: boolean; error?: string } | null;
+  if (response?.error) throw new Error(response.error);
+}
+
+export async function deleteProjectImage(
+  projectId: string,
+  password: string,
+  storagePath: string,
+): Promise<void> {
+  const { data, error } = await supabase.functions.invoke(
+    'delete-project-image',
+    { body: { projectId, password, storagePath } },
+  );
+
+  if (error) throw new Error(`Failed to delete image: ${error.message}`);
+
+  const response = data as { success?: boolean; error?: string } | null;
+  if (response?.error) throw new Error(response.error);
+}
+
+export async function generateDescription(
+  payload: GenerateDescriptionPayload,
+): Promise<string> {
+  const { data, error } = await supabase.functions.invoke(
+    'generate-description',
+    { body: payload },
+  );
+
+  if (error) throw new Error('AI description generation failed.');
+
+  const response = data as { descriptionHtml?: string } | null;
+  if (!response?.descriptionHtml)
+    throw new Error('Empty AI response.');
+
+  return response.descriptionHtml;
 }

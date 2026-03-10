@@ -19,6 +19,8 @@ import { ScrollArea } from '../../../ui/scroll-area';
 interface AddProjectDialogProps {
   onCreate: (payload: CreateProjectPayload) => Promise<void>;
   existingCategories: string[];
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
 }
 
 interface FormState {
@@ -30,13 +32,21 @@ interface FormState {
   team: string;
   technologies: string;
   deletePin: string;
+  contact: string;
 }
 
 export function AddProjectDialog({
   onCreate,
   existingCategories,
+  externalOpen,
+  onExternalOpenChange,
 }: AddProjectDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = externalOpen !== undefined;
+  const open = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled
+    ? (v: boolean) => onExternalOpenChange?.(v)
+    : setInternalOpen;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState<FormState>(() => ({
@@ -48,6 +58,7 @@ export function AddProjectDialog({
     team: '',
     technologies: '',
     deletePin: '',
+    contact: '',
   }));
 
   const isSubmitDisabled = useMemo(() => {
@@ -68,6 +79,7 @@ export function AddProjectDialog({
       team: '',
       technologies: '',
       deletePin: '',
+      contact: '',
     });
     setError('');
   };
@@ -112,6 +124,7 @@ export function AddProjectDialog({
         deletePin: form.deletePin.trim(),
         members,
         tech,
+        contact: form.contact.trim() || undefined,
       });
       setOpen(false);
       resetForm();
@@ -125,13 +138,15 @@ export function AddProjectDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button
-        variant="outline"
-        onClick={() => setOpen(true)}
-        className="border-white text-white hover:bg-white/10 hover:text-white"
-      >
-        + Add Project
-      </Button>
+      {!isControlled && (
+        <Button
+          variant="outline"
+          onClick={() => setOpen(true)}
+          className="border-white text-white hover:bg-white/10 hover:text-white"
+        >
+          + Add Project
+        </Button>
+      )}
       <DialogContent className="max-w-3xl bg-slate-900 border-slate-800" aria-describedby="add-project-description">
         <DialogHeader>
           <DialogTitle className="text-slate-100">Add New Project</DialogTitle>
@@ -195,8 +210,8 @@ export function AddProjectDialog({
                   className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
                 >
                   <option value="In Progress">In Progress</option>
-                  <option value="Testing">Testing</option>
-                  <option value="Completed">Completed</option>
+                  <option value="Finished">Finished</option>
+                  <option value="History">History</option>
                 </select>
               </label>
 
@@ -234,6 +249,20 @@ export function AddProjectDialog({
                 />
               </label>
             </div>
+
+            <label className="flex flex-col gap-2">
+              <span className="text-sm text-slate-400">Contact Info</span>
+              <input
+                name="contact"
+                value={form.contact}
+                onChange={handleChange}
+                placeholder="Email or phone number"
+                className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
+              />
+              <span className="text-xs text-slate-500">
+                So others can reach the project creator.
+              </span>
+            </label>
 
             <label className="flex flex-col gap-2">
               <span className="text-sm text-slate-400">Project PIN *</span>
