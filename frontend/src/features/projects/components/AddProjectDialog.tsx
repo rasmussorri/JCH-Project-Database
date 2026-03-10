@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 
+import { PROJECT_STATUSES } from '../types';
 import type { CreateProjectPayload, Project } from '../types';
 import { getInitials } from '../../../utils/formatting';
 import { RichTextEditor } from '../../../components/RichTextEditor';
@@ -209,9 +210,11 @@ export function AddProjectDialog({
                   onChange={handleChange}
                   className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
                 >
-                  <option value="In Progress">In Progress</option>
-                  <option value="Finished">Finished</option>
-                  <option value="History">History</option>
+                  {PROJECT_STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
                 </select>
               </label>
 

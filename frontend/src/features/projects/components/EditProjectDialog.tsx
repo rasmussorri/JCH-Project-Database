@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 
+import { PROJECT_STATUSES } from '../types';
 import type { Project, UpdateProjectPayload } from '../types';
 import { getInitials } from '../../../utils/formatting';
 import { RichTextEditor } from '../../../components/RichTextEditor';
@@ -24,7 +25,7 @@ interface EditProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (payload: UpdateProjectPayload) => Promise<void>;
-  onImageDeleted?: () => void;
+  onImageDeleted?: () => void | Promise<unknown>;
 }
 
 interface FormState {
@@ -70,6 +71,21 @@ export function EditProjectDialog({
   // Image management state
   const [deletingImage, setDeletingImage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!open) return;
+    setForm({
+      title: project.title,
+      descriptionHtml: project.description_html ?? project.description,
+      category: project.category,
+      status: project.status,
+      startDate: project.startDate.split('T')[0],
+      team: project.team.join(', '),
+      technologies: project.technologies.join(', '),
+      contact: project.contact ?? '',
+    });
+    setError('');
+  }, [open, project]);
+
   const isSubmitDisabled = useMemo(() => {
     return !form.title.trim() || !stripHtml(form.descriptionHtml).trim();
   }, [form.title, form.descriptionHtml]);
@@ -110,7 +126,7 @@ export function EditProjectDialog({
         startedAt: form.startDate,
         members,
         tech,
-        contact: form.contact.trim() || undefined,
+        contact: form.contact.trim(),
       });
       onOpenChange(false);
     } catch (err) {
@@ -156,7 +172,7 @@ export function EditProjectDialog({
     setDeletingImage(storagePath);
     try {
       await projectService.deleteProjectImage(project.id, password, storagePath);
-      onImageDeleted?.();
+      await onImageDeleted?.();
     } catch (err) {
       console.error('Failed to delete image:', err);
       setError('Failed to delete image.');
@@ -318,9 +334,11 @@ export function EditProjectDialog({
                   onChange={handleChange}
                   className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
                 >
-                  <option value="In Progress">In Progress</option>
-                  <option value="Finished">Finished</option>
-                  <option value="History">History</option>
+                  {PROJECT_STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
                 </select>
               </label>
               <label className="flex flex-col gap-2">

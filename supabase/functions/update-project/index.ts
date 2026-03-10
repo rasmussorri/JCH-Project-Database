@@ -8,6 +8,7 @@ import bcrypt from "https://esm.sh/bcryptjs@2.4.3";
 import { handleCorsOptions, json } from "../_shared/cors.ts";
 
 const ALLOWED_STATUSES = ["In Progress", "Finished", "History"] as const;
+type ProjectStatus = (typeof ALLOWED_STATUSES)[number];
 
 interface UpdateProjectBody {
   projectId: string;
@@ -24,6 +25,23 @@ interface UpdateProjectBody {
 
 function stripHtmlTags(html: string): string {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function normalizeStatus(status: string | undefined): ProjectStatus {
+  const normalized = status?.trim();
+  if (
+    normalized === "In Progress" ||
+    normalized === "Finished" ||
+    normalized === "History"
+  ) {
+    return normalized;
+  }
+
+  // Legacy values from older status model.
+  if (normalized === "Testing") return "Finished";
+  if (normalized === "Completed") return "History";
+
+  return "In Progress";
 }
 
 Deno.serve(async (req) => {
@@ -66,11 +84,7 @@ Deno.serve(async (req) => {
     if (body.category !== undefined)
       updates.category = body.category.trim() || "Uncategorized";
     if (body.status !== undefined) {
-      updates.status = ALLOWED_STATUSES.includes(
-        body.status as (typeof ALLOWED_STATUSES)[number]
-      )
-        ? body.status
-        : "In Progress";
+      updates.status = normalizeStatus(body.status);
     }
     if (body.startedAt !== undefined) updates.started_at = body.startedAt || null;
     if (body.contact !== undefined) updates.contact = body.contact?.trim() || null;

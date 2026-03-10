@@ -11,7 +11,7 @@ export function useProjects() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const fetchProjects = useCallback(async () => {
+  const fetchProjects = useCallback(async (): Promise<Project[]> => {
     setLoading(true);
     setLoadError(null);
     try {
@@ -20,10 +20,12 @@ export function useProjects() {
       setSelectedProject((prev) =>
         prev ? fetched.find((p) => p.id === prev.id) ?? null : null,
       );
+      return fetched;
     } catch (err) {
       console.error('Failed to fetch projects:', err);
       setLoadError('Failed to load projects. Please refresh.');
       setProjects([]);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -74,7 +76,7 @@ export function useProjects() {
   );
 
   const handleDeleteProject = useCallback(
-    async (projectId: string, password: string): Promise<boolean> => {
+    async (projectId: string, password: string): Promise<string | true> => {
       try {
         await projectService.deleteProject(projectId, password);
         await fetchProjects();
@@ -84,7 +86,7 @@ export function useProjects() {
         return true;
       } catch (err) {
         console.error('Failed to delete project:', err);
-        return false;
+        return err instanceof Error ? err.message : 'Delete failed. Please try again.';
       }
     },
     [fetchProjects, selectedProject?.id],
@@ -93,7 +95,9 @@ export function useProjects() {
   const handleUpdateProject = useCallback(
     async (payload: UpdateProjectPayload) => {
       await projectService.updateProject(payload);
-      await fetchProjects();
+      const fetched = await fetchProjects();
+      const updated = fetched.find((p) => p.id === payload.projectId) ?? null;
+      setSelectedProject(updated);
     },
     [fetchProjects],
   );

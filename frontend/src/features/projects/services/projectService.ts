@@ -8,6 +8,7 @@ import type {
   GenerateDescriptionPayload,
   Project,
 } from '../types';
+import { normalizeProjectStatus } from '../types';
 import type { SupabaseProject } from '../supabaseTypes';
 
 function mapSupabaseProject(row: SupabaseProject): Project {
@@ -31,7 +32,7 @@ function mapSupabaseProject(row: SupabaseProject): Project {
     description: row.description ?? '',
     description_html: row.description_html ?? undefined,
     category: row.category ?? 'Uncategorized',
-    status: row.status ?? 'In Progress',
+    status: normalizeProjectStatus(row.status),
     startDate: row.started_at ?? row.created_at ?? new Date().toISOString(),
     team: (row.project_members ?? [])
       .map((member) => member.name ?? '')
@@ -77,13 +78,16 @@ export async function deleteProject(
   projectId: string,
   password: string,
 ): Promise<void> {
-  const { error } = await supabase.functions.invoke('delete-project', {
+  const { data, error } = await supabase.functions.invoke('delete-project', {
     body: { projectId, password },
   });
 
   if (error) {
     throw new Error(`Failed to delete project: ${error.message}`);
   }
+
+  const response = data as { ok?: boolean; error?: string } | null;
+  if (response?.error) throw new Error(response.error);
 }
 
 export async function createCreationSession(

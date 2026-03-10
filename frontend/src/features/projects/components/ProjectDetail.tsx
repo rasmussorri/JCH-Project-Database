@@ -18,11 +18,18 @@ import { EditProjectDialog } from './EditProjectDialog';
 interface ProjectDetailProps {
   project: Project | null;
   onClose: () => void;
-  onDelete?: (projectId: string, password: string) => Promise<boolean>;
+  onDelete?: (projectId: string, password: string) => Promise<string | true>;
   onUpdate?: (payload: UpdateProjectPayload) => Promise<void>;
+  onRefresh?: () => Promise<unknown>;
 }
 
-export function ProjectDetail({ project, onClose, onDelete, onUpdate }: ProjectDetailProps) {
+export function ProjectDetail({
+  project,
+  onClose,
+  onDelete,
+  onUpdate,
+  onRefresh,
+}: ProjectDetailProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditPinDialog, setShowEditPinDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -44,13 +51,18 @@ export function ProjectDetail({ project, onClose, onDelete, onUpdate }: ProjectD
     if (!onDelete) return;
 
     setPasswordError('');
-    const success = await onDelete(project.id, password);
-    
-    if (success) {
+    const result = await onDelete(project.id, password);
+
+    if (result === true) {
       setShowDeleteDialog(false);
       onClose();
     } else {
-      setPasswordError('Incorrect password. Please try again.');
+      const msg = result.toLowerCase();
+      if (msg.includes('incorrect') || msg.includes('password') || msg.includes('pin')) {
+        setPasswordError('Incorrect password. Please try again.');
+      } else {
+        setPasswordError(result);
+      }
     }
   };
 
@@ -234,6 +246,7 @@ export function ProjectDetail({ project, onClose, onDelete, onUpdate }: ProjectD
           open={showEditDialog}
           onOpenChange={setShowEditDialog}
           onSave={onUpdate}
+          onImageDeleted={onRefresh}
         />
       )}
     </>

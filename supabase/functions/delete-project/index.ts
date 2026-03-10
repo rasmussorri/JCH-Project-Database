@@ -60,6 +60,7 @@ Deno.serve(async (req) => {
       }
     }
 
+    await supabase.from("creation_sessions").delete().eq("project_id", projectId);
     await supabase.from("upload_sessions").delete().eq("project_id", projectId);
     await supabase.from("project_images").delete().eq("project_id", projectId);
     await supabase.from("project_members").delete().eq("project_id", projectId);

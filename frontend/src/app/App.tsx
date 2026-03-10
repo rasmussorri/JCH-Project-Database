@@ -162,6 +162,7 @@ export default function App() {
               onClose={() => setSelectedProject(null)}
               onDelete={handleDeleteProject}
               onUpdate={handleUpdateProject}
+              onRefresh={fetchProjects}
             />
           </div>
         }

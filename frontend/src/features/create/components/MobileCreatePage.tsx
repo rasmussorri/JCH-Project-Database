@@ -14,6 +14,7 @@ import { Button } from '../../../ui/button';
 import { StepIndicator } from '../../../components/StepIndicator';
 import { getInitials } from '../../../utils/formatting';
 import { createProjectWithAI } from '../../projects/services/projectService';
+import { PROJECT_STATUSES } from '../../projects/types';
 import type { MobileCreateProjectPayload, Project } from '../../projects/types';
 
 const STEP_LABELS = ['Info', 'Describe', 'Images', 'Review'];
@@ -256,9 +257,11 @@ export function MobileCreatePage() {
                 onChange={handleChange}
                 className={inputClass}
               >
-                <option value="In Progress">In Progress</option>
-                <option value="Finished">Finished</option>
-                <option value="History">History</option>
+                {PROJECT_STATUSES.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
               </select>
             </label>
 
