@@ -7,10 +7,12 @@ interface ImageCarouselProps {
   images: string[];
   alt: string;
   className?: string;
+  contain?: boolean;
 }
 
-export function ImageCarousel({ images, alt, className = '' }: ImageCarouselProps) {
+export function ImageCarousel({ images, alt, className = '', contain = false }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const fitClass = contain ? 'object-contain' : 'object-cover';
 
   if (images.length === 0) {
     return (
@@ -26,7 +28,7 @@ export function ImageCarousel({ images, alt, className = '' }: ImageCarouselProp
         <ImageWithFallback
           src={images[0]}
           alt={alt}
-          className="w-full h-full object-cover"
+          className={`w-full h-full ${fitClass}`}
         />
       </div>
     );
@@ -51,7 +53,7 @@ export function ImageCarousel({ images, alt, className = '' }: ImageCarouselProp
       <ImageWithFallback
         src={images[currentIndex]}
         alt={`${alt} - Image ${currentIndex + 1} of ${images.length}`}
-        className="w-full h-full object-cover transition-opacity duration-300"
+        className={`w-full h-full ${fitClass} transition-opacity duration-300`}
       />
       
       {/* Navigation Buttons */}

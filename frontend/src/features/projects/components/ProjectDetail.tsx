@@ -85,8 +85,8 @@ export function ProjectDetail({
         <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-[calc(100%-2rem)] lg:max-w-6xl h-[95vh] sm:h-[90vh] max-h-[95vh] sm:max-h-[90vh] p-0 bg-slate-900 border-slate-800 flex flex-col">
           <div className="flex-1 min-h-0 overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="relative h-48 sm:h-64 lg:h-80 overflow-hidden bg-slate-800">
-                <ImageCarousel images={images} alt={project.title} />
+              <div className="relative h-64 sm:h-80 lg:h-[28rem] overflow-hidden bg-slate-800">
+                <ImageCarousel images={images} alt={project.title} contain />
                 <div className="absolute top-3 left-3 sm:top-6 sm:left-6 flex gap-2 sm:gap-3">
                   <Badge className={statusColors[project.status]}>
                     {project.status}

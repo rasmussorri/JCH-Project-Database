@@ -21,7 +21,7 @@ export function ProjectCard({ project, images, onClick }: ProjectCardProps) {
       onClick={onClick}
     >
       <div className="relative h-40 sm:h-48 lg:h-56 overflow-hidden bg-slate-800">
-        <ImageCarousel images={images} alt={project.title} />
+        <ImageCarousel images={images} alt={project.title} contain />
         <div className="absolute top-4 left-4 z-10">
           <Badge className={statusColors[project.status]}>
             {project.status}
