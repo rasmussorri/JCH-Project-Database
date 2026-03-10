@@ -23,7 +23,8 @@ build/
 # Logs
 *.log
 
+# Supabase CLI local state
+supabase/.temp/
+
 # Coverage / tests
 coverage/
-
-
