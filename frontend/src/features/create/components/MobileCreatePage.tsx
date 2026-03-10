@@ -2,7 +2,6 @@ import { useState, useRef, useCallback } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Upload,
   X,
   CheckCircle,
   Loader2,
@@ -15,7 +14,7 @@ import { Button } from '../../../ui/button';
 import { StepIndicator } from '../../../components/StepIndicator';
 import { getInitials } from '../../../utils/formatting';
 import { createProjectWithAI } from '../../projects/services/projectService';
-import type { MobileCreateProjectPayload } from '../../projects/types';
+import type { MobileCreateProjectPayload, Project } from '../../projects/types';
 
 const STEP_LABELS = ['Info', 'Describe', 'Images', 'Review'];
 const MAX_IMAGES = 10;
@@ -23,7 +22,7 @@ const MAX_IMAGES = 10;
 interface FormState {
   title: string;
   category: string;
-  status: 'In Progress' | 'Testing' | 'Completed';
+  status: Project['status'];
   startDate: string;
   team: string;
   technologies: string;
