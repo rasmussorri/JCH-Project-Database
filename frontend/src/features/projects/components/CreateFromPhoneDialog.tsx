@@ -184,9 +184,14 @@ export function CreateFromPhoneDialog({
                 </Button>
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-slate-400">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Waiting for project to be created...
+              <div className="flex flex-col items-center gap-1 text-sm text-slate-400">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Waiting for project to be created...
+                </div>
+                <p className="text-xs text-slate-500">
+                  Please refresh the page after creating the project.
+                </p>
               </div>
             </>
           )}
