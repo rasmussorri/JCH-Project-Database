@@ -270,12 +270,15 @@ export function AddProjectDialog({
             <label className="flex flex-col gap-2">
               <span className="text-sm text-slate-400">Project PIN *</span>
               <input
-                type="password"
+                type="text"
                 name="deletePin"
                 value={form.deletePin}
                 onChange={handleChange}
                 placeholder="Min 4 characters"
-                className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
+                className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none pin-mask"
+                autoComplete="off"
+                data-1p-ignore=""
+                data-lpignore="true"
                 minLength={4}
                 required
               />

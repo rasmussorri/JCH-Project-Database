@@ -244,3 +244,8 @@ html {
   transform: scale(0.6);
   transform-origin: bottom right;
 }
+
+.pin-mask {
+  -webkit-text-security: disc;
+  text-security: disc;
+}

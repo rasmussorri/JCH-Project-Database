@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import {
@@ -68,6 +68,17 @@ export function MobileCreatePage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const prevBodyBg = document.body.style.backgroundColor;
+    const prevHtmlBg = document.documentElement.style.backgroundColor;
+    document.body.style.backgroundColor = '#020617';
+    document.documentElement.style.backgroundColor = '#020617';
+    return () => {
+      document.body.style.backgroundColor = prevBodyBg;
+      document.documentElement.style.backgroundColor = prevHtmlBg;
+    };
+  }, []);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -178,7 +189,7 @@ export function MobileCreatePage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-slate-950 px-4 py-6 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 overflow-x-hidden px-4 py-6 flex items-center justify-center">
         <div className="max-w-md mx-auto text-center space-y-4">
           <h1 className="text-xl sm:text-2xl font-semibold text-slate-100">Invalid link</h1>
           <p className="text-slate-400">This creation link is missing or invalid.</p>
@@ -189,7 +200,7 @@ export function MobileCreatePage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-950 px-4 py-6 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 overflow-x-hidden px-4 py-6 flex items-center justify-center">
         <div className="max-w-md mx-auto text-center space-y-6">
           <CheckCircle className="w-14 h-14 sm:w-16 sm:h-16 text-green-500 mx-auto" />
           <h1 className="text-xl sm:text-2xl font-semibold text-slate-100">Project created!</h1>
@@ -206,7 +217,7 @@ export function MobileCreatePage() {
   const labelClass = 'text-sm text-slate-400';
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-slate-950 overflow-x-hidden">
       <div className="max-w-lg mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Header */}
         <div>
@@ -272,7 +283,7 @@ export function MobileCreatePage() {
                 name="startDate"
                 value={form.startDate}
                 onChange={handleChange}
-                className={inputClass}
+                className={`${inputClass} min-w-0`}
               />
             </label>
 
@@ -315,12 +326,15 @@ export function MobileCreatePage() {
             <label className="flex flex-col gap-1.5">
               <span className={labelClass}>Project PIN *</span>
               <input
-                type="password"
+                type="text"
                 name="deletePin"
                 value={form.deletePin}
                 onChange={handleChange}
                 placeholder="Min 4 characters"
-                className={inputClass}
+                className={`${inputClass} pin-mask`}
+                autoComplete="off"
+                data-1p-ignore=""
+                data-lpignore="true"
                 minLength={4}
               />
               <span className="text-xs text-slate-500">
