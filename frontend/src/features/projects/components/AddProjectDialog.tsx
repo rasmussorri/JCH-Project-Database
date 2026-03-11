@@ -6,6 +6,8 @@ import type { CreateProjectPayload, Project } from '../types';
 import { getInitials } from '../../../utils/formatting';
 import { RichTextEditor } from '../../../components/RichTextEditor';
 import { stripHtml } from '../../../lib/sanitizeHtml';
+import * as projectService from '../services/projectService';
+import { useApiStatus } from '../../../contexts/ApiStatusContext';
 import {
   Dialog,
   DialogContent,
@@ -16,12 +18,15 @@ import {
 } from '../../../ui/dialog';
 import { Button } from '../../../ui/button';
 import { ScrollArea } from '../../../ui/scroll-area';
+import { Loader2, Sparkles } from 'lucide-react';
 
 interface AddProjectDialogProps {
   onCreate: (payload: CreateProjectPayload) => Promise<void>;
   existingCategories: string[];
   externalOpen?: boolean;
   onExternalOpenChange?: (open: boolean) => void;
+  /** When set, this password is used for creation and the creation password field is hidden (e.g. after modal verification). */
+  creationPassword?: string;
 }
 
 interface FormState {
@@ -42,6 +47,7 @@ export function AddProjectDialog({
   existingCategories,
   externalOpen,
   onExternalOpenChange,
+  creationPassword: verifiedCreationPassword,
 }: AddProjectDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = externalOpen !== undefined;
@@ -51,6 +57,8 @@ export function AddProjectDialog({
     : setInternalOpen;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const apiStatus = useApiStatus();
   const [form, setForm] = useState<FormState>(() => ({
     title: '',
     descriptionHtml: '',
@@ -95,6 +103,35 @@ export function AddProjectDialog({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleGenerateWithAI = async () => {
+    setError('');
+    setAiGenerating(true);
+    try {
+      const technologies = form.technologies
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+      const html = await projectService.generateDescription({
+        title: form.title.trim(),
+        problem: '',
+        goal: '',
+        technologies,
+        status: form.status,
+        notes: stripHtml(form.descriptionHtml).trim() || '',
+      });
+      setForm((prev) => ({ ...prev, descriptionHtml: html || '<p></p>' }));
+    } catch (err) {
+      console.error('AI description generation failed:', err);
+      const message = err instanceof Error ? err.message : '';
+      if (message.includes('API credits') || message.includes('credits exhausted')) {
+        apiStatus?.setApiCreditsExhausted(true);
+      }
+      setError(message || 'AI description generation failed. Please try again.');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting) return;
@@ -118,13 +155,15 @@ export function AddProjectDialog({
 
     try {
       const descriptionHtml = (form.descriptionHtml ?? '').trim() || '<p></p>';
+      const creationPasswordToSend =
+        verifiedCreationPassword?.trim() || (form.creationPassword.trim() ? form.creationPassword.trim() : undefined);
       await onCreate({
         title: form.title.trim(),
         description_html: descriptionHtml,
         category: form.category.trim() || 'Uncategorized',
         status: form.status,
         startedAt: form.startDate,
-        ...(form.creationPassword.trim() ? { creationPassword: form.creationPassword.trim() } : {}),
+        ...(creationPasswordToSend ? { creationPassword: creationPasswordToSend } : {}),
         deletePin: form.deletePin.trim(),
         members,
         tech,
@@ -196,7 +235,32 @@ export function AddProjectDialog({
             </div>
 
             <div className="flex flex-col gap-2">
-              <span className="text-sm text-slate-400">Description *</span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-400">Description *</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleGenerateWithAI}
+                  disabled={aiGenerating || !form.title.trim()}
+                  className="text-cyan-400 hover:text-cyan-300 hover:bg-slate-800 text-xs"
+                >
+                  {aiGenerating ? (
+                    <>
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      Generate with AI
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-slate-500">
+                Optional: generate from title, technologies, status, and any notes you add here.
+              </p>
               <RichTextEditor
                 value={form.descriptionHtml}
                 onChange={(html) => setForm((prev) => ({ ...prev, descriptionHtml: html }))}
@@ -271,23 +335,25 @@ export function AddProjectDialog({
               </span>
             </label>
 
-            <label className="flex flex-col gap-2">
-              <span className="text-sm text-slate-400">Creation password</span>
-              <input
-                type="password"
-                name="creationPassword"
-                value={form.creationPassword}
-                onChange={handleChange}
-                placeholder="Required if enabled by administrator"
-                className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
-                autoComplete="off"
-                data-1p-ignore=""
-                data-lpignore="true"
-              />
-              <span className="text-xs text-slate-500">
-                Shared password to allow creating new projects (separate from project PIN).
-              </span>
-            </label>
+            {verifiedCreationPassword == null && (
+              <label className="flex flex-col gap-2">
+                <span className="text-sm text-slate-400">Creation password</span>
+                <input
+                  type="password"
+                  name="creationPassword"
+                  value={form.creationPassword}
+                  onChange={handleChange}
+                  placeholder="Required if enabled by administrator"
+                  className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
+                  autoComplete="off"
+                  data-1p-ignore=""
+                  data-lpignore="true"
+                />
+                <span className="text-xs text-slate-500">
+                  Shared password to allow creating new projects (separate from project PIN).
+                </span>
+              </label>
+            )}
 
             <label className="flex flex-col gap-2">
               <span className="text-sm text-slate-400">Project PIN *</span>

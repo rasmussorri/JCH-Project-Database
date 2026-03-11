@@ -17,13 +17,21 @@ interface CreateFromPhoneDialogProps {
   onProjectCreated: () => void;
   onFallbackClick: () => void;
   existingCategories: string[];
+  /** When set, dialog open state is controlled by parent and the "+ Add Project" button is not rendered. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function CreateFromPhoneDialog({
   onProjectCreated,
   onFallbackClick,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: CreateFromPhoneDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined && controlledOnOpenChange !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? (v: boolean) => controlledOnOpenChange?.(v) : setInternalOpen;
   const [loading, setLoading] = useState(false);
   const [createUrl, setCreateUrl] = useState('');
   const [token, setToken] = useState('');
@@ -117,13 +125,15 @@ export function CreateFromPhoneDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <Button
-        variant="outline"
-        onClick={() => setOpen(true)}
-        className="border-white text-white hover:bg-white/10 hover:text-white"
-      >
-        + Add Project
-      </Button>
+      {!isControlled && (
+        <Button
+          variant="outline"
+          onClick={() => setOpen(true)}
+          className="border-white text-white hover:bg-white/10 hover:text-white"
+        >
+          + Add Project
+        </Button>
+      )}
       <DialogContent
         className="max-w-[calc(100%-1rem)] sm:max-w-md bg-slate-900 border-slate-800"
         aria-describedby="create-from-phone-desc"

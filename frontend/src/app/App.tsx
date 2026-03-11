@@ -6,6 +6,7 @@ import { ProjectDetail } from "../features/projects/components/ProjectDetail";
 import { FilterBar } from "../features/projects/components/FilterBar";
 import { AddProjectDialog } from "../features/projects/components/AddProjectDialog";
 import { CreateFromPhoneDialog } from "../features/projects/components/CreateFromPhoneDialog";
+import { CreationPasswordModal } from "../features/projects/components/CreationPasswordModal";
 import { UploadPage } from "../features/uploads/components/UploadPage";
 import { MobileCreatePage } from "../features/create/components/MobileCreatePage";
 import { useProjects } from "../features/projects/hooks/useProjects";
@@ -119,6 +120,10 @@ function HomeWithBanner({
 }) {
   const apiStatus = useApiStatus();
   const [showHeader, setShowHeader] = useState(true);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [verifiedCreationPassword, setVerifiedCreationPassword] = useState('');
+
   useEffect(() => {
     const handleScroll = () => setShowHeader(window.scrollY < 10);
     handleScroll();
@@ -189,17 +194,39 @@ function HomeWithBanner({
                 projects={projects}
                 addProjectSlot={
                   <>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowPasswordModal(true)}
+                      className="border-white text-white hover:bg-white/10 hover:text-white"
+                    >
+                      + Add Project
+                    </Button>
+                    <CreationPasswordModal
+                      open={showPasswordModal}
+                      onOpenChange={setShowPasswordModal}
+                      onSuccess={(password) => {
+                        setVerifiedCreationPassword(password);
+                        setShowPasswordModal(false);
+                        setCreateDialogOpen(true);
+                      }}
+                    />
                     <CreateFromPhoneDialog
                       onProjectCreated={handlePhoneProjectCreated}
                       onFallbackClick={() => setShowDesktopFallback(true)}
                       existingCategories={categories}
+                      open={createDialogOpen}
+                      onOpenChange={setCreateDialogOpen}
                     />
                     {showDesktopFallback && (
                       <AddProjectDialog
                         onCreate={handleCreateProject}
                         existingCategories={categories}
                         externalOpen={showDesktopFallback}
-                        onExternalOpenChange={setShowDesktopFallback}
+                        onExternalOpenChange={(open) => {
+                          setShowDesktopFallback(open);
+                          if (!open) setVerifiedCreationPassword('');
+                        }}
+                        creationPassword={verifiedCreationPassword || undefined}
                       />
                     )}
                   </>

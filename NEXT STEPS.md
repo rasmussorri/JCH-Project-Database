@@ -1,1 +1,1 @@
-Password for 
+Password for adding a project? (if gets put on LUT website)
