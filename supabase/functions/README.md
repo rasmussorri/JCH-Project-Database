@@ -23,7 +23,8 @@ Use your project ref in place of `YOUR_PROJECT_REF`.
 
 Supabase sets **`SUPABASE_URL`** and **`SUPABASE_SERVICE_ROLE_KEY`** automatically.
 
-- **create-project**: No extra env vars.
+- **create-project**: Optional **`CREATION_PASSWORD`**. If set, users must send the same value as `creationPassword` in the request body to create a project; otherwise the function returns 403. Use this to gate who can create projects (separate from the per-project PIN).
+- **create-project-with-ai**: Same **`CREATION_PASSWORD`** as create-project. If set, mobile creation requires the creation password.
 - **delete-project**: Set **`ADMIN_PASSWORD`** in the function’s secrets (Supabase Dashboard → Edge Functions → delete-project → Settings). Min 8 characters. Users can delete a project with either the project PIN or this admin password.
 - **create-upload-session**: Set **`ADMIN_PASSWORD`** (same as above). Optional: **`UPLOAD_SESSION_TTL_MINUTES`** (default `10`).
 - **sign-upload**: No extra env vars.

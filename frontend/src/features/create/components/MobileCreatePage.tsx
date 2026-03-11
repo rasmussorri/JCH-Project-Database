@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Camera,
   Send,
+  Upload,
 } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { StepIndicator } from '../../../components/StepIndicator';
@@ -27,6 +28,7 @@ interface FormState {
   startDate: string;
   team: string;
   technologies: string;
+  creationPassword: string;
   deletePin: string;
   contact: string;
   problem: string;
@@ -56,6 +58,7 @@ export function MobileCreatePage() {
     startDate: new Date().toISOString().split('T')[0],
     team: '',
     technologies: '',
+    creationPassword: '',
     deletePin: '',
     contact: '',
     problem: '',
@@ -67,7 +70,8 @@ export function MobileCreatePage() {
   const [submitPhase, setSubmitPhase] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -131,6 +135,7 @@ export function MobileCreatePage() {
       const payload: MobileCreateProjectPayload = {
         token,
         title: form.title.trim(),
+        ...(form.creationPassword.trim() ? { creationPassword: form.creationPassword.trim() } : {}),
         problem: form.problem.trim(),
         goal: form.goal.trim(),
         technologies,
@@ -313,6 +318,24 @@ export function MobileCreatePage() {
             </label>
 
             <label className="flex flex-col gap-1.5">
+              <span className={labelClass}>Creation password</span>
+              <input
+                type="password"
+                name="creationPassword"
+                value={form.creationPassword}
+                onChange={handleChange}
+                placeholder="Required if enabled by administrator"
+                className={inputClass}
+                autoComplete="off"
+                data-1p-ignore=""
+                data-lpignore="true"
+              />
+              <span className="text-xs text-slate-500">
+                Shared password to create projects (separate from project PIN).
+              </span>
+            </label>
+
+            <label className="flex flex-col gap-1.5">
               <span className={labelClass}>Project PIN *</span>
               <input
                 type="text"
@@ -407,7 +430,15 @@ export function MobileCreatePage() {
         {step === 3 && (
           <div className="space-y-5">
             <input
-              ref={fileInputRef}
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageSelect}
+              className="hidden"
+            />
+            <input
+              ref={cameraInputRef}
               type="file"
               accept="image/*"
               capture="environment"
@@ -416,19 +447,28 @@ export function MobileCreatePage() {
               className="hidden"
             />
 
-            <Button
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={images.length >= MAX_IMAGES}
-              className="w-full border-dashed border-2 border-slate-700 hover:border-cyan-500 bg-slate-800/50 text-slate-300 py-8"
-            >
-              <Camera className="w-6 h-6 mr-2" />
-              {images.length === 0
-                ? 'Add Images'
-                : `Add More (${images.length}/${MAX_IMAGES})`}
-            </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                onClick={() => galleryInputRef.current?.click()}
+                disabled={images.length >= MAX_IMAGES}
+                className="w-full border-dashed border-2 border-slate-700 hover:border-cyan-500 bg-slate-800/50 text-slate-300 py-6"
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                {images.length === 0 ? 'Choose from gallery' : `Add more (${images.length}/${MAX_IMAGES})`}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => cameraInputRef.current?.click()}
+                disabled={images.length >= MAX_IMAGES}
+                className="w-full border-dashed border-2 border-slate-700 hover:border-cyan-500 bg-slate-800/50 text-slate-300 py-6"
+              >
+                <Camera className="w-5 h-5 mr-2" />
+                Take photo
+              </Button>
+            </div>
             <p className="text-xs text-slate-500 text-center">
-              You can take photos or select from gallery. Up to {MAX_IMAGES} images.
+              Choose existing photos from gallery or take new ones. Up to {MAX_IMAGES} images.
             </p>
 
             {images.length > 0 && (

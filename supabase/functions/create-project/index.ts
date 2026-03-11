@@ -12,6 +12,8 @@ const ALLOWED_STATUSES = ["In Progress", "Finished", "History"] as const;
 interface CreateProjectBody {
   title: string;
   deletePin: string;
+  /** Required when CREATION_PASSWORD env is set. Used to gate who can create projects. */
+  creationPassword?: string;
   description?: string;
   description_html?: string;
   category?: string;
@@ -33,6 +35,13 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(url, key);
     const body: CreateProjectBody = await req.json();
+
+    const CREATION_PASSWORD = Deno.env.get("CREATION_PASSWORD") ?? "";
+    if (CREATION_PASSWORD.length > 0) {
+      if (!body.creationPassword || body.creationPassword !== CREATION_PASSWORD) {
+        return json(403, { error: "Incorrect creation password" });
+      }
+    }
 
     if (!body.title?.trim() || !body.deletePin) {
       return json(400, { error: "Missing title or deletePin" });

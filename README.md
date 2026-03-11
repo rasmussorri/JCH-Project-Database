@@ -73,7 +73,7 @@ npx supabase functions deploy sign-upload --no-verify-jwt
 npx supabase functions deploy generate-description --no-verify-jwt
 ```
 
-See `supabase/functions/README.md` for secrets (e.g. `ADMIN_PASSWORD`, `UPLOAD_SESSION_TTL_MINUTES`).
+See `supabase/functions/README.md` for secrets (e.g. `CREATION_PASSWORD`, `ADMIN_PASSWORD`, `UPLOAD_SESSION_TTL_MINUTES`).
 
 ### Database / migrations
 

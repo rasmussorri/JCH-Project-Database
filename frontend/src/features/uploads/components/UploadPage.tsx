@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
-import { Upload, X, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { Upload, X, CheckCircle, Loader2, ArrowLeft, Camera } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../../ui/button';
 import { ImageWithFallback } from '../../../components/ImageWithFallback';
@@ -21,7 +21,8 @@ export function UploadPage() {
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   if (!token) {
     return (
@@ -60,6 +61,7 @@ export function UploadPage() {
       }
     };
     reader.readAsDataURL(file);
+    if (event.target) event.target.value = '';
   };
 
   const removeFile = () => {
@@ -122,31 +124,49 @@ export function UploadPage() {
             Upload images
           </h1>
           <p className="text-slate-400">
-            Select an image and upload it to the project.
+            Choose an image from your gallery or take a new photo to upload.
           </p>
         </div>
 
         <div className="bg-slate-900 rounded-lg border border-slate-800 p-4 sm:p-6 space-y-4 sm:space-y-6">
-          <div>
+          <div className="space-y-3">
             <input
-              ref={fileInputRef}
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <input
+              ref={cameraInputRef}
               type="file"
               accept="image/*"
               capture="environment"
               onChange={handleFileSelect}
               className="hidden"
             />
-            <Button
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full border-dashed border-2 border-slate-700 hover:border-cyan-500 bg-slate-800/50 text-slate-300"
-              disabled={uploading || uploaded}
-            >
-              <Upload className="w-5 h-5 mr-2" />
-              Select image
-            </Button>
-            <p className="text-xs text-slate-500 mt-2 text-center">
-              You can also take a photo directly with your camera
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                onClick={() => galleryInputRef.current?.click()}
+                className="w-full border-dashed border-2 border-slate-700 hover:border-cyan-500 bg-slate-800/50 text-slate-300"
+                disabled={uploading || uploaded}
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                Choose from gallery
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => cameraInputRef.current?.click()}
+                className="w-full border-dashed border-2 border-slate-700 hover:border-cyan-500 bg-slate-800/50 text-slate-300"
+                disabled={uploading || uploaded}
+              >
+                <Camera className="w-5 h-5 mr-2" />
+                Take photo
+              </Button>
+            </div>
+            <p className="text-xs text-slate-500 text-center">
+              On mobile, &quot;Choose from gallery&quot; lets you pick existing photos or files.
             </p>
           </div>
 

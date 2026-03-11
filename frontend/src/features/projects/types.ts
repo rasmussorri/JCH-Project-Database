@@ -38,6 +38,8 @@ export interface CreateProjectPayload {
   status: ProjectStatus;
   startedAt: string;
   deletePin: string;
+  /** Required when CREATION_PASSWORD is set on the server. Gate for allowing project creation. */
+  creationPassword?: string;
   members: Array<{ name: string; initials: string }>;
   tech: string[];
   contact?: string;
@@ -46,6 +48,8 @@ export interface CreateProjectPayload {
 export interface MobileCreateProjectPayload {
   token: string;
   title: string;
+  /** Required when CREATION_PASSWORD is set on the server. Gate for allowing project creation. */
+  creationPassword?: string;
   problem: string;
   goal: string;
   technologies: string[];

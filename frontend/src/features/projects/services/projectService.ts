@@ -65,13 +65,13 @@ export async function fetchProjects(): Promise<Project[]> {
 }
 
 export async function createProject(payload: CreateProjectPayload): Promise<void> {
-  const { error } = await supabase.functions.invoke('create-project', {
+  const { data, error } = await supabase.functions.invoke('create-project', {
     body: payload,
   });
 
-  if (error) {
-    throw error;
-  }
+  const errMsg = (data as { error?: string } | null)?.error;
+  if (errMsg) throw new Error(errMsg);
+  if (error) throw error;
 }
 
 export async function deleteProject(
@@ -122,6 +122,9 @@ export async function createProjectWithAI(
         : String(error);
     throw new Error(msg);
   }
+
+  const errMsg = (data as { error?: string } | null)?.error;
+  if (errMsg) throw new Error(errMsg);
 
   const response = data as MobileCreateProjectResponse | null;
   if (!response?.projectId) throw new Error('Project creation failed.');

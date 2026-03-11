@@ -32,6 +32,7 @@ interface FormState {
   startDate: string;
   team: string;
   technologies: string;
+  creationPassword: string;
   deletePin: string;
   contact: string;
 }
@@ -58,6 +59,7 @@ export function AddProjectDialog({
     startDate: new Date().toISOString().split('T')[0],
     team: '',
     technologies: '',
+    creationPassword: '',
     deletePin: '',
     contact: '',
   }));
@@ -79,6 +81,7 @@ export function AddProjectDialog({
       startDate: new Date().toISOString().split('T')[0],
       team: '',
       technologies: '',
+      creationPassword: '',
       deletePin: '',
       contact: '',
     });
@@ -99,7 +102,6 @@ export function AddProjectDialog({
       setError('Project PIN must be at least 4 characters.');
       return;
     }
-
     setSubmitting(true);
     setError('');
 
@@ -122,6 +124,7 @@ export function AddProjectDialog({
         category: form.category.trim() || 'Uncategorized',
         status: form.status,
         startedAt: form.startDate,
+        ...(form.creationPassword.trim() ? { creationPassword: form.creationPassword.trim() } : {}),
         deletePin: form.deletePin.trim(),
         members,
         tech,
@@ -131,7 +134,8 @@ export function AddProjectDialog({
       resetForm();
     } catch (err) {
       console.error('Failed to create project:', err);
-      setError('Failed to create project. Please try again.');
+      const message = err instanceof Error ? err.message : 'Failed to create project. Please try again.';
+      setError(message);
     } finally {
       setSubmitting(false);
     }
@@ -264,6 +268,24 @@ export function AddProjectDialog({
               />
               <span className="text-xs text-slate-500">
                 So others can reach the project creator.
+              </span>
+            </label>
+
+            <label className="flex flex-col gap-2">
+              <span className="text-sm text-slate-400">Creation password</span>
+              <input
+                type="password"
+                name="creationPassword"
+                value={form.creationPassword}
+                onChange={handleChange}
+                placeholder="Required if enabled by administrator"
+                className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
+                autoComplete="off"
+                data-1p-ignore=""
+                data-lpignore="true"
+              />
+              <span className="text-xs text-slate-500">
+                Shared password to allow creating new projects (separate from project PIN).
               </span>
             </label>
 
