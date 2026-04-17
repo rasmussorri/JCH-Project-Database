@@ -2,6 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import legacy from '@vitejs/plugin-legacy'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -26,7 +27,13 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      legacy({
+        // Add a legacy bundle for older browsers on the info screen.
+        targets: ['defaults', 'ie >= 11'],
+      }),
+    ],
     server: { proxy },
   }
 })
