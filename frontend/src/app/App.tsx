@@ -230,6 +230,7 @@ function HomeWithBanner({
                         onExternalOpenChange={(open) => {
                           setShowDesktopFallback(open);
                         }}
+                        isCompatibilityMode={isCompatibilityMode}
                       />
                     )}
                   </>

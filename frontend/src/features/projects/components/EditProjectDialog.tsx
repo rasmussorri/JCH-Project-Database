@@ -27,6 +27,7 @@ interface EditProjectDialogProps {
   onOpenChange: (open: boolean) => void;
   onSave: (payload: UpdateProjectPayload) => Promise<void>;
   onImageDeleted?: () => void | Promise<unknown>;
+  isCompatibilityMode?: boolean;
 }
 
 interface FormState {
@@ -47,6 +48,7 @@ export function EditProjectDialog({
   onOpenChange,
   onSave,
   onImageDeleted,
+  isCompatibilityMode = false,
 }: EditProjectDialogProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -60,6 +62,12 @@ export function EditProjectDialog({
     technologies: project.technologies.join(', '),
     contact: project.contact ?? '',
   }));
+
+  const ScrollContainer = isCompatibilityMode
+    ? ({ children, className }: { children: React.ReactNode; className?: string }) => (
+        <div className={`overflow-y-auto overflow-x-hidden ${className}`}>{children}</div>
+      )
+    : ScrollArea;
 
   // AI regeneration state
   const [showAiForm, setShowAiForm] = useState(false);
@@ -208,7 +216,7 @@ export function EditProjectDialog({
             Edit project details including title, description, status, and images.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="max-h-[70vh] pr-4">
+        <ScrollContainer className="max-h-[70vh] pr-4">
           <form
             className="space-y-6 text-slate-200"
             onSubmit={handleSubmit}
@@ -437,7 +445,7 @@ export function EditProjectDialog({
               </div>
             )}
           </form>
-        </ScrollArea>
+        </ScrollContainer>
 
         <DialogFooter className="flex gap-2 pt-4">
           <Button

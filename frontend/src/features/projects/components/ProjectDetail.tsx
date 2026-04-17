@@ -345,6 +345,7 @@ export function ProjectDetail({
           onOpenChange={setShowEditDialog}
           onSave={onUpdate}
           onImageDeleted={onRefresh}
+          isCompatibilityMode={isCompatibilityMode}
         />
       )}
     </>

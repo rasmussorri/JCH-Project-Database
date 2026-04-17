@@ -25,6 +25,7 @@ interface AddProjectDialogProps {
   existingCategories: string[];
   externalOpen?: boolean;
   onExternalOpenChange?: (open: boolean) => void;
+  isCompatibilityMode?: boolean;
 }
 
 interface FormState {
@@ -44,6 +45,7 @@ export function AddProjectDialog({
   existingCategories,
   externalOpen,
   onExternalOpenChange,
+  isCompatibilityMode = false,
 }: AddProjectDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = externalOpen !== undefined;
@@ -66,6 +68,12 @@ export function AddProjectDialog({
     deletePin: '',
     contact: '',
   }));
+
+  const ScrollContainer = isCompatibilityMode
+    ? ({ children, className }: { children: React.ReactNode; className?: string }) => (
+        <div className={`overflow-y-auto overflow-x-hidden ${className}`}>{children}</div>
+      )
+    : ScrollArea;
 
   const isSubmitDisabled = useMemo(() => {
     return (
@@ -189,7 +197,7 @@ export function AddProjectDialog({
             Form to add a new project with title, category, description, status, date, team, and technologies.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="max-h-[70vh] pr-4">
+        <ScrollContainer className="max-h-[70vh] pr-4">
           <form
             className="space-y-6 text-slate-200"
             onSubmit={handleSubmit}
@@ -352,7 +360,7 @@ export function AddProjectDialog({
               </div>
             )}
           </form>
-        </ScrollArea>
+        </ScrollContainer>
 
         <DialogFooter className="flex gap-2 pt-4">
           <Button

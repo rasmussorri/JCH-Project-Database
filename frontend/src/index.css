@@ -336,3 +336,10 @@ html {
 .compat-mode [class*="border-slate-"] {
   border-color: rgba(148, 163, 184, 0.35) !important;
 }
+
+.compat-mode * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
