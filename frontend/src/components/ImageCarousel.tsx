@@ -8,9 +8,10 @@ interface ImageCarouselProps {
   alt: string;
   className?: string;
   contain?: boolean;
+  isCompatibilityMode?: boolean;
 }
 
-export function ImageCarousel({ images, alt, className = '', contain = false }: ImageCarouselProps) {
+export function ImageCarousel({ images, alt, className = '', contain = false, isCompatibilityMode = false }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const fitClass = contain ? 'object-contain' : 'object-cover';
 
@@ -22,13 +23,13 @@ export function ImageCarousel({ images, alt, className = '', contain = false }: 
     );
   }
 
-  if (images.length === 1) {
+  if (images.length === 1 || isCompatibilityMode) {
     return (
       <div className={`relative w-full h-full ${className}`}>
         <ImageWithFallback
-          src={images[0]}
+          src={isCompatibilityMode ? images[0] : images[0]}
           alt={alt}
-          className={`w-full h-full ${fitClass}`}
+          className={`w-full h-full ${fitClass} ${isCompatibilityMode ? '' : 'transition-opacity duration-300'}`}
         />
       </div>
     );

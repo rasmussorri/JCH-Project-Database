@@ -156,7 +156,7 @@ function HomeWithBanner({
                 className="absolute inset-0 w-full h-full object-cover"
               />
 
-              <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]" />
+              <div className={`absolute inset-0 bg-slate-900/50 ${isCompatibilityMode ? "" : "backdrop-blur-[2px]"}`} />
 
               <PageContainer className="py-4 sm:py-6 lg:py-8 relative z-10">
                 <div className="flex bg-black border-0 overflow-hidden rounded-sm shadow-2xl w-fit max-w-full">

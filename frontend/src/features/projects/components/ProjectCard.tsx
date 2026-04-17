@@ -26,7 +26,7 @@ export function ProjectCard({ project, images, onClick, isCompatibilityMode = fa
       onClick={onClick}
     >
       <div className="relative h-40 sm:h-48 lg:h-56 overflow-hidden bg-slate-800">
-        <ImageCarousel images={images} alt={project.title} contain />
+        <ImageCarousel images={images} alt={project.title} contain isCompatibilityMode={isCompatibilityMode} />
         <div className="absolute top-4 left-4 z-10">
           <Badge className={statusColors[project.status]}>
             {project.status}

@@ -85,7 +85,100 @@ export function ProjectDetail({
     <>
       <Dialog open={!!project} onOpenChange={onClose}>
         <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-[calc(100%-2rem)] lg:max-w-6xl h-[95vh] sm:h-[90vh] max-h-[95vh] sm:max-h-[90vh] p-0 bg-slate-900 border-slate-800 flex flex-col">
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className={`flex-1 min-h-0 ${isCompatibilityMode ? 'overflow-y-auto overflow-x-hidden' : 'overflow-hidden'}`}>
+            {isCompatibilityMode ? (
+              <div>
+                <div className="relative h-64 sm:h-80 lg:h-[28rem] overflow-hidden bg-slate-800">
+                  <ImageCarousel images={images} alt={project.title} contain isCompatibilityMode />
+                  <div className="absolute top-3 left-3 sm:top-6 sm:left-6 flex gap-2 sm:gap-3">
+                    <Badge className={statusColors[project.status]}>
+                      {project.status}
+                    </Badge>
+                    <Badge variant="outline" className={`${categoryColors[project.category] ?? ''} border-0 text-white`}>
+                      {project.category}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+                  <DialogHeader>
+                    <DialogTitle className="text-slate-100">{project.title}</DialogTitle>
+                  </DialogHeader>
+
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Info className="w-5 h-5" />
+                        <span>Project Description</span>
+                      </div>
+                      <div
+                        className="text-slate-400 pl-7 max-w-none [&_p]:my-1 [&_strong]:font-bold [&_em]:italic [&_u]:underline [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-0.5 [&_li]:list-item"
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeDescriptionHtml(project.description_html ?? project.description),
+                        }}
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Users className="w-5 h-5" />
+                        <span>Team Members</span>
+                      </div>
+                      <div className="pl-7 space-y-3">
+                        {project.team.map((member, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback className="bg-slate-700 text-slate-200">
+                                {getInitials(member)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-slate-300">{member}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Code2 className="w-5 h-5" />
+                        <span>Technologies & Tools</span>
+                      </div>
+                      <div className="pl-7 flex flex-wrap gap-2">
+                        {project.technologies.map((tech) => (
+                          <Badge key={tech} variant="secondary" className="bg-slate-800 text-slate-300 hover:bg-slate-800">
+                            {tech}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Calendar className="w-5 h-5" />
+                        <span>Project Started</span>
+                      </div>
+                      <p className="text-slate-400 pl-7">
+                        {new Date(project.startDate).toLocaleDateString('en-US', {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+
+                    {project.contact && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <Mail className="w-5 h-5" />
+                          <span>Contact</span>
+                        </div>
+                        <p className="text-slate-400 pl-7">{project.contact}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
             <ScrollArea className="h-full">
               <div className="relative h-64 sm:h-80 lg:h-[28rem] overflow-hidden bg-slate-800">
                 <ImageCarousel images={images} alt={project.title} contain />
@@ -181,6 +274,7 @@ export function ProjectDetail({
                 </div>
               </div>
             </ScrollArea>
+            )}
           </div>
           {!isCompatibilityMode && (onDelete || onUpdate) && (
             <DialogFooter className="border-t border-slate-800 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex-shrink-0 bg-slate-900 relative z-50 pointer-events-auto">
