@@ -25,8 +25,6 @@ interface AddProjectDialogProps {
   existingCategories: string[];
   externalOpen?: boolean;
   onExternalOpenChange?: (open: boolean) => void;
-  /** When set, this password is used for creation and the creation password field is hidden (e.g. after modal verification). */
-  creationPassword?: string;
 }
 
 interface FormState {
@@ -37,7 +35,6 @@ interface FormState {
   startDate: string;
   team: string;
   technologies: string;
-  creationPassword: string;
   deletePin: string;
   contact: string;
 }
@@ -47,7 +44,6 @@ export function AddProjectDialog({
   existingCategories,
   externalOpen,
   onExternalOpenChange,
-  creationPassword: verifiedCreationPassword,
 }: AddProjectDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = externalOpen !== undefined;
@@ -67,7 +63,6 @@ export function AddProjectDialog({
     startDate: new Date().toISOString().split('T')[0],
     team: '',
     technologies: '',
-    creationPassword: '',
     deletePin: '',
     contact: '',
   }));
@@ -89,7 +84,6 @@ export function AddProjectDialog({
       startDate: new Date().toISOString().split('T')[0],
       team: '',
       technologies: '',
-      creationPassword: '',
       deletePin: '',
       contact: '',
     });
@@ -155,15 +149,12 @@ export function AddProjectDialog({
 
     try {
       const descriptionHtml = (form.descriptionHtml ?? '').trim() || '<p></p>';
-      const creationPasswordToSend =
-        verifiedCreationPassword?.trim() || (form.creationPassword.trim() ? form.creationPassword.trim() : undefined);
       await onCreate({
         title: form.title.trim(),
         description_html: descriptionHtml,
         category: form.category.trim() || 'Uncategorized',
         status: form.status,
         startedAt: form.startDate,
-        ...(creationPasswordToSend ? { creationPassword: creationPasswordToSend } : {}),
         deletePin: form.deletePin.trim(),
         members,
         tech,
@@ -334,26 +325,6 @@ export function AddProjectDialog({
                 So others can reach the project creator.
               </span>
             </label>
-
-            {verifiedCreationPassword == null && (
-              <label className="flex flex-col gap-2">
-                <span className="text-sm text-slate-400">Creation password</span>
-                <input
-                  type="password"
-                  name="creationPassword"
-                  value={form.creationPassword}
-                  onChange={handleChange}
-                  placeholder="Required if enabled by administrator"
-                  className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-100 focus:border-cyan-500 focus:outline-none"
-                  autoComplete="off"
-                  data-1p-ignore=""
-                  data-lpignore="true"
-                />
-                <span className="text-xs text-slate-500">
-                  Shared password to allow creating new projects (separate from project PIN).
-                </span>
-              </label>
-            )}
 
             <label className="flex flex-col gap-2">
               <span className="text-sm text-slate-400">Project PIN *</span>

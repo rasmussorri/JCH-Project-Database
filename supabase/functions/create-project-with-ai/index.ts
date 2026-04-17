@@ -29,8 +29,6 @@ Rules:
 interface MobileCreateBody {
   token: string;
   title: string;
-  /** Required when CREATION_PASSWORD env is set. Used to gate who can create projects. */
-  creationPassword?: string;
   problem?: string;
   goal?: string;
   technologies?: string[];
@@ -136,13 +134,6 @@ Deno.serve(async (req) => {
     if (!body?.title?.trim()) return json(400, { error: "Missing title" });
     if (!body?.deletePin || body.deletePin.trim().length < 4)
       return json(400, { error: "PIN must be at least 4 characters" });
-
-    const CREATION_PASSWORD = Deno.env.get("CREATION_PASSWORD") ?? "";
-    if (CREATION_PASSWORD.length > 0) {
-      if (!body.creationPassword || body.creationPassword !== CREATION_PASSWORD) {
-        return json(403, { error: "Incorrect creation password" });
-      }
-    }
 
     // Validate creation session
     const { data: session, error: sessErr } = await supabase

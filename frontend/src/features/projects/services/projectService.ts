@@ -90,19 +90,6 @@ export async function deleteProject(
   if (response?.error) throw new Error(response.error);
 }
 
-export async function verifyCreationPassword(
-  creationPassword: string,
-): Promise<void> {
-  const { data, error } = await supabase.functions.invoke(
-    'verify-creation-password',
-    { body: { creationPassword: creationPassword.trim() } },
-  );
-
-  const errMsg = (data as { error?: string } | null)?.error;
-  if (errMsg) throw new Error(errMsg);
-  if (error) throw error;
-}
-
 export async function createCreationSession(
   appBaseUrl: string,
 ): Promise<CreateCreationSessionResponse> {

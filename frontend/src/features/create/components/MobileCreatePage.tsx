@@ -10,12 +10,11 @@ import {
   Camera,
   Send,
   Upload,
-  Lock,
 } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { StepIndicator } from '../../../components/StepIndicator';
 import { getInitials } from '../../../utils/formatting';
-import { createProjectWithAI, verifyCreationPassword } from '../../projects/services/projectService';
+import { createProjectWithAI } from '../../projects/services/projectService';
 import { PROJECT_STATUSES } from '../../projects/types';
 import type { MobileCreateProjectPayload, Project } from '../../projects/types';
 
@@ -29,7 +28,6 @@ interface FormState {
   startDate: string;
   team: string;
   technologies: string;
-  creationPassword: string;
   deletePin: string;
   contact: string;
   problem: string;
@@ -51,11 +49,6 @@ function getFileExtension(file: File): string {
 
 export function MobileCreatePage() {
   const { token } = useParams();
-  const [creationPasswordVerified, setCreationPasswordVerified] = useState(false);
-  const [creationPasswordInput, setCreationPasswordInput] = useState('');
-  const [creationPasswordError, setCreationPasswordError] = useState('');
-  const [verifyingPassword, setVerifyingPassword] = useState(false);
-  const verifiedCreationPasswordRef = useRef<string>('');
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>({
     title: '',
@@ -64,7 +57,6 @@ export function MobileCreatePage() {
     startDate: new Date().toISOString().split('T')[0],
     team: '',
     technologies: '',
-    creationPassword: '',
     deletePin: '',
     contact: '',
     problem: '',
@@ -138,13 +130,9 @@ export function MobileCreatePage() {
         .map((t) => t.trim())
         .filter(Boolean);
 
-      const creationPasswordToSend =
-        verifiedCreationPasswordRef.current.trim() ||
-        (form.creationPassword.trim() ? form.creationPassword.trim() : undefined);
       const payload: MobileCreateProjectPayload = {
         token,
         title: form.title.trim(),
-        ...(creationPasswordToSend ? { creationPassword: creationPasswordToSend } : {}),
         problem: form.problem.trim(),
         goal: form.goal.trim(),
         technologies,
@@ -182,31 +170,11 @@ export function MobileCreatePage() {
 
       setSubmitPhase('Done!');
       setSubmitted(true);
-      verifiedCreationPasswordRef.current = '';
     } catch (err) {
       console.error('Create project error:', err);
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleVerifyCreationPassword = async () => {
-    if (!creationPasswordInput.trim()) {
-      setCreationPasswordError('Enter the creation password.');
-      return;
-    }
-    setCreationPasswordError('');
-    setVerifyingPassword(true);
-    try {
-      await verifyCreationPassword(creationPasswordInput.trim());
-      verifiedCreationPasswordRef.current = creationPasswordInput.trim();
-      setCreationPasswordInput('');
-      setCreationPasswordVerified(true);
-    } catch (err) {
-      setCreationPasswordError(err instanceof Error ? err.message : 'Incorrect password');
-    } finally {
-      setVerifyingPassword(false);
     }
   };
 
@@ -238,67 +206,6 @@ export function MobileCreatePage() {
   const inputClass =
     'w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none';
   const labelClass = 'text-sm text-slate-400';
-
-  if (!creationPasswordVerified) {
-    return (
-      <div className="min-h-screen bg-slate-950 overflow-x-hidden px-4 py-6 flex items-center justify-center">
-        <div className="w-full max-w-md mx-auto space-y-6">
-          <div>
-            <p className="text-xs text-slate-500 mb-1">JHC Project Database</p>
-            <h1 className="text-xl font-semibold text-slate-100 flex items-center gap-2">
-              <Lock className="w-5 h-5" />
-              Enter creation password
-            </h1>
-            <p className="text-slate-400 text-sm mt-2">
-              A password is required to create new projects.
-            </p>
-          </div>
-          <div className="space-y-4">
-            <label className="flex flex-col gap-2">
-              <span className={labelClass}>Password</span>
-              <input
-                type="password"
-                value={creationPasswordInput}
-                onChange={(e) => {
-                  setCreationPasswordInput(e.target.value);
-                  setCreationPasswordError('');
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleVerifyCreationPassword();
-                }}
-                placeholder="Enter password"
-                className={`${inputClass} ${creationPasswordError ? 'border-red-600' : ''}`}
-                disabled={verifyingPassword}
-                autoComplete="off"
-                data-1p-ignore=""
-                data-lpignore="true"
-              />
-              {creationPasswordError && (
-                <span className="text-sm text-red-500">{creationPasswordError}</span>
-              )}
-            </label>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => window.history.back()}
-                className="flex-1 border-slate-700 text-slate-300 hover:bg-slate-800"
-                disabled={verifyingPassword}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleVerifyCreationPassword}
-                disabled={verifyingPassword}
-                className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white"
-              >
-                {verifyingPassword ? 'Checking…' : 'Continue'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-950 overflow-x-hidden">
