@@ -12,6 +12,7 @@ import { useProjects } from "../features/projects/hooks/useProjects";
 import { PageContainer } from "../components/layout/PageContainer";
 import { Button } from "../ui/button";
 import { Info, X } from "lucide-react";
+import { getRuntimeProfile } from "../lib/runtimeProfile";
 
 const JHC_BACKGROUND =
   "https://lut.pictures.fi/kuvat/LUT%20Press%20Images/Facilities/JHC%20-%20J.%20Hyneman%20Center/Working%20in%20JHC/8977-jhc-protos.jpg?img=img4k";
@@ -36,6 +37,19 @@ export default function App() {
   } = useProjects();
 
   const [showDesktopFallback, setShowDesktopFallback] = useState(false);
+  const [isCompatibilityMode, setIsCompatibilityMode] = useState(false);
+
+  useEffect(() => {
+    const profile = getRuntimeProfile();
+    setIsCompatibilityMode(profile.isCompatibilityMode);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("compat-mode", isCompatibilityMode);
+    return () => {
+      document.documentElement.classList.remove("compat-mode");
+    };
+  }, [isCompatibilityMode]);
 
   const handlePhoneProjectCreated = useCallback(async () => {
     await fetchProjects();
@@ -68,6 +82,7 @@ export default function App() {
               setShowDesktopFallback={setShowDesktopFallback}
               handlePhoneProjectCreated={handlePhoneProjectCreated}
               selectedProject={selectedProject}
+              isCompatibilityMode={isCompatibilityMode}
             />
           }
         />
@@ -97,6 +112,7 @@ function HomeWithBanner({
   setShowDesktopFallback,
   handlePhoneProjectCreated,
   selectedProject,
+  isCompatibilityMode,
 }: {
   loadError: string | null;
   filteredProjects: import("../features/projects/types").Project[];
@@ -116,6 +132,7 @@ function HomeWithBanner({
   setShowDesktopFallback: (v: boolean) => void;
   handlePhoneProjectCreated: () => Promise<void>;
   selectedProject: import("../features/projects/types").Project | null;
+  isCompatibilityMode: boolean;
 }) {
   const apiStatus = useApiStatus();
   const [showHeader, setShowHeader] = useState(true);
@@ -228,6 +245,7 @@ function HomeWithBanner({
                   <ProjectGrid
                     projects={filteredProjects}
                     onProjectClick={setSelectedProject}
+                    isCompatibilityMode={isCompatibilityMode}
                   />
 
                   {filteredProjects.length === 0 && (
@@ -265,6 +283,7 @@ function HomeWithBanner({
               onDelete={handleDeleteProject}
               onUpdate={handleUpdateProject}
               onRefresh={fetchProjects}
+              isCompatibilityMode={isCompatibilityMode}
             />
           </div>
   );

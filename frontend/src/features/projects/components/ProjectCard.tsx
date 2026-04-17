@@ -12,12 +12,17 @@ interface ProjectCardProps {
   project: Project;
   images: string[];
   onClick: () => void;
+  isCompatibilityMode?: boolean;
 }
 
-export function ProjectCard({ project, images, onClick }: ProjectCardProps) {
+export function ProjectCard({ project, images, onClick, isCompatibilityMode = false }: ProjectCardProps) {
+  const cardClassName = isCompatibilityMode
+    ? "overflow-hidden cursor-pointer touch-manipulation bg-slate-900 border-slate-800"
+    : "overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] touch-manipulation bg-slate-900/90 border-slate-800";
+
   return (
     <Card 
-      className="overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] touch-manipulation bg-slate-900/90 border-slate-800"
+      className={cardClassName}
       onClick={onClick}
     >
       <div className="relative h-40 sm:h-48 lg:h-56 overflow-hidden bg-slate-800">

@@ -6,9 +6,10 @@ import { ResponsiveGrid } from '../../../components/layout/ResponsiveGrid';
 interface ProjectGridProps {
   projects: Project[];
   onProjectClick: (project: Project) => void;
+  isCompatibilityMode?: boolean;
 }
 
-export function ProjectGrid({ projects, onProjectClick }: ProjectGridProps) {
+export function ProjectGrid({ projects, onProjectClick, isCompatibilityMode = false }: ProjectGridProps) {
   return (
     <ResponsiveGrid>
       {projects.map((project) => (
@@ -17,6 +18,7 @@ export function ProjectGrid({ projects, onProjectClick }: ProjectGridProps) {
           project={project}
           images={resolveProjectImages(project)}
           onClick={() => onProjectClick(project)}
+          isCompatibilityMode={isCompatibilityMode}
         />
       ))}
     </ResponsiveGrid>

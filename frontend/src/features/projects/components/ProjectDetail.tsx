@@ -21,6 +21,7 @@ interface ProjectDetailProps {
   onDelete?: (projectId: string, password: string) => Promise<string | true>;
   onUpdate?: (payload: UpdateProjectPayload) => Promise<void>;
   onRefresh?: () => Promise<unknown>;
+  isCompatibilityMode?: boolean;
 }
 
 export function ProjectDetail({
@@ -29,6 +30,7 @@ export function ProjectDetail({
   onDelete,
   onUpdate,
   onRefresh,
+  isCompatibilityMode = false,
 }: ProjectDetailProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditPinDialog, setShowEditPinDialog] = useState(false);
@@ -173,12 +175,14 @@ export function ProjectDetail({
                     </div>
                   )}
 
-                  <UploadLink projectId={project.id} projectTitle={project.title} />
+                  {!isCompatibilityMode && (
+                    <UploadLink projectId={project.id} projectTitle={project.title} />
+                  )}
                 </div>
               </div>
             </ScrollArea>
           </div>
-          {(onDelete || onUpdate) && (
+          {!isCompatibilityMode && (onDelete || onUpdate) && (
             <DialogFooter className="border-t border-slate-800 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex-shrink-0 bg-slate-900 relative z-50 pointer-events-auto">
               <div className="flex flex-col-reverse sm:flex-row gap-2 w-full sm:justify-between">
                 {onUpdate && (

@@ -254,3 +254,63 @@ html {
   -webkit-text-security: disc;
   text-security: disc;
 }
+
+/* Legacy/smart-display compatibility overrides */
+.compat-mode {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  --primary: #f8fafc;
+  --primary-foreground: #0f172a;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #cbd5e1;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --border: rgba(148, 163, 184, 0.4);
+  --input: #1e293b;
+  --ring: #38bdf8;
+  --sidebar: #111827;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #0f172a;
+  --sidebar-accent: #1f2937;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: rgba(148, 163, 184, 0.4);
+  --sidebar-ring: #38bdf8;
+}
+
+.compat-mode *,
+.compat-mode *::before,
+.compat-mode *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.compat-mode [data-slot="dialog-overlay"] {
+  background-color: rgba(0, 0, 0, 0.82) !important;
+}
+
+.compat-mode [data-slot="dialog-content"] {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+.compat-mode [data-slot="dialog-overlay"],
+.compat-mode [data-slot="dialog-content"] {
+  animation: none !important;
+  transition: none !important;
+}
+
+.compat-mode .text-slate-100,
+.compat-mode .text-slate-200,
+.compat-mode .text-slate-300,
+.compat-mode .text-slate-400,
+.compat-mode .text-slate-500,
+.compat-mode .text-muted-foreground {
+  color: #e2e8f0 !important;
+}

@@ -89,7 +89,6 @@ export function PasswordDialog({
               className={`rounded-lg border px-4 py-2 bg-slate-800 text-slate-100 focus:border-cyan-500 focus:outline-none ${
                 displayError ? 'border-red-600' : 'border-slate-700'
               }`}
-              autoFocus
             />
             {displayError && (
               <span className="text-sm text-red-500">{displayError}</span>
