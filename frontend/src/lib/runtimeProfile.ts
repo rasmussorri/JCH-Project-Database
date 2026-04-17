@@ -13,9 +13,17 @@ function safeCssSupports(property: string, value: string): boolean {
 export function getRuntimeProfile(): RuntimeProfile {
   const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
   const isSmartTvUa = /Tizen|SMART-TV|SmartTV|TV|NetCast|Web0S|WebOS|HbbTV/i.test(userAgent);
-  const compatParamEnabled =
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).get('compat') === '1';
+  const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const compatParam = params?.get('compat');
+
+  if (typeof window !== 'undefined') {
+    if (compatParam === '1') {
+      window.localStorage.setItem('compat-mode', '1');
+    } else if (compatParam === '0') {
+      window.localStorage.removeItem('compat-mode');
+    }
+  }
+
   const compatStorageEnabled =
     typeof window !== 'undefined' && window.localStorage.getItem('compat-mode') === '1';
 
@@ -24,12 +32,9 @@ export function getRuntimeProfile(): RuntimeProfile {
   const supportsBackdropFilter =
     safeCssSupports('backdrop-filter', 'blur(2px)') || safeCssSupports('-webkit-backdrop-filter', 'blur(2px)');
 
-  if (typeof window !== 'undefined' && compatParamEnabled) {
-    window.localStorage.setItem('compat-mode', '1');
-  }
-
-  const isCompatibilityMode =
-    compatParamEnabled || compatStorageEnabled || isSmartTvUa || !supportsModernColor || !supportsHasSelector || !supportsBackdropFilter;
+  const isCompatibilityMode = compatParam === '0' 
+    ? false 
+    : (compatParam === '1' || compatStorageEnabled || isSmartTvUa || !supportsModernColor || !supportsHasSelector || !supportsBackdropFilter);
 
   return { isCompatibilityMode };
 }
