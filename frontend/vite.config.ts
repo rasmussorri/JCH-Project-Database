@@ -34,6 +34,9 @@ export default defineConfig(({ mode }) => {
         targets: ['defaults', 'ie >= 11'],
       }),
     ],
+    build: {
+      target: 'es2022',
+    },
     server: { proxy },
   }
 })
