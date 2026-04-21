@@ -32,6 +32,8 @@ export default defineConfig(({ mode }) => {
       legacy({
         // Add a legacy bundle for older browsers on the info screen.
         targets: ['defaults', 'ie >= 11'],
+        // Explicitly set modernTargets to prevent plugin-legacy from downgrading Esbuild to Chrome 64
+        modernTargets: 'since 2021-01-01, not dead',
       }),
     ],
     build: {
