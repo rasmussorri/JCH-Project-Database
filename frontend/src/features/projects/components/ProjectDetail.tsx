@@ -276,7 +276,7 @@ export function ProjectDetail({
             </ScrollArea>
             )}
           </div>
-          {!isCompatibilityMode && (onDelete || onUpdate) && (
+          {(onDelete || onUpdate) && (
             <DialogFooter className="border-t border-slate-800 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex-shrink-0 bg-slate-900 relative z-50 pointer-events-auto">
               <div className="flex flex-col-reverse sm:flex-row gap-2 w-full sm:justify-between">
                 {onUpdate && (
