@@ -289,6 +289,8 @@ html {
 .compat-mode *::after {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
 .compat-mode [data-slot="dialog-overlay"] {
@@ -315,6 +317,10 @@ html {
   color: #e2e8f0 !important;
 }
 
+.compat-mode img {
+  image-orientation: from-image !important;
+}
+
 .compat-mode p,
 .compat-mode span,
 .compat-mode h1,
@@ -328,7 +334,9 @@ html {
 .compat-mode a,
 .compat-mode button,
 .compat-mode input,
-.compat-mode textarea {
+.compat-mode textarea,
+.compat-mode select,
+.compat-mode option {
   color: #e2e8f0;
 }
 
