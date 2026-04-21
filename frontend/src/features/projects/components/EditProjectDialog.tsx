@@ -330,14 +330,24 @@ export function EditProjectDialog({
                 </div>
               )}
 
-              <RichTextEditor
-                value={form.descriptionHtml}
-                onChange={(html) =>
-                  setForm((prev) => ({ ...prev, descriptionHtml: html }))
-                }
-                placeholder="Describe the project goals and outcomes..."
-                minHeight="120px"
-              />
+              {isCompatibilityMode ? (
+                <textarea
+                  value={form.descriptionHtml}
+                  onChange={(e) => setForm((prev) => ({ ...prev, descriptionHtml: e.target.value }))}
+                  placeholder="Describe the project goals and outcomes (HTML allowed)..."
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none min-h-[120px] resize-y"
+                  required
+                />
+              ) : (
+                <RichTextEditor
+                  value={form.descriptionHtml}
+                  onChange={(html) =>
+                    setForm((prev) => ({ ...prev, descriptionHtml: html }))
+                  }
+                  placeholder="Describe the project goals and outcomes..."
+                  minHeight="120px"
+                />
+              )}
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
