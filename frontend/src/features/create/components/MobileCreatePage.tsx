@@ -15,6 +15,7 @@ import { Button } from '../../../ui/button';
 import { StepIndicator } from '../../../components/StepIndicator';
 import { getInitials } from '../../../utils/formatting';
 import { createProjectWithAI } from '../../projects/services/projectService';
+import { compressImageForUpload } from '../../../lib/imageOptimization';
 import { PROJECT_STATUSES } from '../../projects/types';
 import type { MobileCreateProjectPayload, Project } from '../../projects/types';
 
@@ -80,24 +81,31 @@ export function MobileCreatePage() {
   );
 
   const handleImageSelect = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
+    async (e: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files ?? []);
       if (files.length === 0) return;
 
       const remaining = MAX_IMAGES - images.length;
       const toAdd = files.slice(0, remaining);
 
-      for (const file of toAdd) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          if (ev.target?.result) {
-            setImages((prev) => [
-              ...prev,
-              { file, preview: ev.target!.result as string },
-            ]);
-          }
-        };
-        reader.readAsDataURL(file);
+      // Show uploading indicator on the UI if we want, but compressing is usually quick enough
+      for (const rawFile of toAdd) {
+        try {
+          const compressedFile = await compressImageForUpload(rawFile);
+          
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            if (ev.target?.result) {
+              setImages((prev) => [
+                ...prev,
+                { file: compressedFile, preview: ev.target!.result as string },
+              ]);
+            }
+          };
+          reader.readAsDataURL(compressedFile);
+        } catch (err) {
+          console.error("Failed to compress file", err);
+        }
       }
 
       if (e.target) e.target.value = '';

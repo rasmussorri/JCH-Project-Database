@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../../ui/button';
 import { ImageWithFallback } from '../../../components/ImageWithFallback';
 import { signUpload } from '../services/uploadService';
+import { compressImageForUpload } from '../../../lib/imageOptimization';
 
 function getFileExtension(file: File): string {
   const fromName = file.name.split('.').pop();
@@ -76,20 +77,21 @@ export function UploadPage() {
     setError(null);
 
     try {
-      const fileExt = getFileExtension(selectedFile);
+      const compressedFile = await compressImageForUpload(selectedFile);
+      const fileExt = getFileExtension(compressedFile);
       const signedUrl = await signUpload(
         token,
         fileExt,
-        selectedFile.type || 'image/jpeg',
+        compressedFile.type || 'image/jpeg',
       );
 
       const response = await fetch(signedUrl, {
         method: 'PUT',
         headers: {
-          'content-type': selectedFile.type || 'image/jpeg',
+          'content-type': compressedFile.type || 'image/jpeg',
           'x-upsert': 'true',
         },
-        body: selectedFile,
+        body: compressedFile,
       });
 
       if (!response.ok) {
