@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '../../../ui/card';
 import { Badge } from '../../../ui/badge';
 import { Avatar, AvatarFallback } from '../../../ui/avatar';
 import { ImageCarousel } from '../../../components/ImageCarousel';
+import { cn } from '../../../ui/utils';
 import { Calendar, Users } from 'lucide-react';
 
 interface ProjectCardProps {
