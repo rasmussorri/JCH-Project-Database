@@ -63,11 +63,13 @@ export function EditProjectDialog({
     contact: project.contact ?? '',
   }));
 
-  const ScrollContainer = isCompatibilityMode
-    ? ({ children, className }: { children: React.ReactNode; className?: string }) => (
-        <div className={`overflow-y-auto overflow-x-hidden ${className}`}>{children}</div>
-      )
-    : ScrollArea;
+  const ScrollContainer = useMemo(() => {
+    return isCompatibilityMode
+      ? ({ children, className }: { children: React.ReactNode; className?: string }) => (
+          <div className={`overflow-y-auto overflow-x-hidden ${className}`}>{children}</div>
+        )
+      : ScrollArea;
+  }, [isCompatibilityMode]);
 
   // AI regeneration state
   const [showAiForm, setShowAiForm] = useState(false);
@@ -367,9 +369,9 @@ export function EditProjectDialog({
                 </select>
               </label>
               <label className="flex flex-col gap-2">
-                <span className="text-sm text-slate-400">Start Date</span>
+                <span className="text-sm text-slate-400">Start Date {isCompatibilityMode && '(YYYY-MM-DD)'}</span>
                 <input
-                  type="date"
+                  type={isCompatibilityMode ? "text" : "date"}
                   name="startDate"
                   value={form.startDate}
                   onChange={handleChange}

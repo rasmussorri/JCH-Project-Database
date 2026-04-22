@@ -156,7 +156,7 @@ function HomeWithBanner({
 
               <PageContainer className="py-4 sm:py-6 lg:py-8 relative z-10">
                 <div className="flex justify-between items-center gap-4">
-                  <div className="flex bg-black border-0 overflow-hidden rounded-sm shadow-2xl w-fit max-w-full">
+                  <div className="flex bg-black border-0 overflow-hidden shadow-2xl w-fit max-w-full header-title-box">
                     <div
                       className="w-2 shrink-0"
                       style={{ backgroundColor: "#009933" }}
@@ -293,9 +293,16 @@ function HomeWithBanner({
               onRefresh={fetchProjects}
               isCompatibilityMode={isCompatibilityMode}
             />
+
             <IdleOverlay 
               isCompatibilityMode={isCompatibilityMode} 
-              onIdle={() => setSelectedProject(null)}
+              onIdle={() => {
+                setSelectedProject(null);
+                setCreateDialogOpen(false);
+                setShowDesktopFallback(false);
+                setFilteredCategory("All");
+                setFilteredStatus("All");
+              }}
             />
           </div>
   );

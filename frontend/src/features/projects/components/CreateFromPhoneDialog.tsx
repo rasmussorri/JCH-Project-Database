@@ -216,14 +216,14 @@ export function CreateFromPhoneDialog({
           )}
         </div>
 
-        <DialogFooter className="flex-col gap-2 sm:flex-col">
+        <DialogFooter className="flex-col gap-3 sm:flex-col pt-2">
           <button
             type="button"
             onClick={() => {
               setOpen(false);
               onFallbackClick();
             }}
-            className="text-xs text-slate-500 hover:text-slate-300 transition-colors underline underline-offset-2"
+            className="w-full py-3 px-4 rounded-lg bg-slate-800 border border-slate-700 text-sm font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors flex items-center justify-center gap-2 shadow-lg"
           >
             Create from desktop instead
           </button>

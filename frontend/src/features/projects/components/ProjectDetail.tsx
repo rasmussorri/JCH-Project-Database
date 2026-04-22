@@ -124,7 +124,7 @@ export function ProjectDetail({
                         <Users className={`w-5 h-5 ${isCompatibilityMode ? 'mr-2' : ''}`} />
                         <span>Team Members</span>
                       </div>
-                      <div className="pl-7">
+                      <div className={`pl-7 ${isCompatibilityMode ? 'space-y-3' : ''}`}>
                         {project.team.map((member, index) => (
                           <div key={index} className="flex items-center gap-3">
                             <Avatar className="w-10 h-10">
