@@ -23,11 +23,11 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
     );
   }
 
-  if (images.length === 1 || isCompatibilityMode) {
+  if (images.length === 1) {
     return (
       <div className={`relative w-full h-full ${className}`}>
         <ImageWithFallback
-          src={isCompatibilityMode ? images[0] : images[0]}
+          src={images[0]}
           alt={alt}
           className={`w-full h-full ${fitClass} ${isCompatibilityMode ? '' : 'transition-opacity duration-300'}`}
         />
@@ -54,7 +54,7 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
       <ImageWithFallback
         src={images[currentIndex]}
         alt={`${alt} - Image ${currentIndex + 1} of ${images.length}`}
-        className={`w-full h-full ${fitClass} transition-opacity duration-300`}
+        className={`w-full h-full ${fitClass} ${isCompatibilityMode ? '' : 'transition-opacity duration-300'}`}
       />
       
       {/* Navigation Buttons */}
@@ -62,24 +62,24 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
         variant="ghost"
         size="icon"
         onClick={goToPrevious}
-        className="absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/50 hover:bg-slate-900/70 text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
+        className={`absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/70 hover:bg-slate-900/90 text-slate-100 transition-opacity ${isCompatibilityMode ? 'opacity-100 w-12 h-12' : 'opacity-0 group-hover:opacity-100'}`}
         aria-label="Previous image"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className={`${isCompatibilityMode ? 'w-8 h-8' : 'w-5 h-5'}`} />
       </Button>
       
       <Button
         variant="ghost"
         size="icon"
         onClick={goToNext}
-        className="absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/50 hover:bg-slate-900/70 text-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
+        className={`absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/70 hover:bg-slate-900/90 text-slate-100 transition-opacity ${isCompatibilityMode ? 'opacity-100 w-12 h-12' : 'opacity-0 group-hover:opacity-100'}`}
         aria-label="Next image"
       >
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className={`${isCompatibilityMode ? 'w-8 h-8' : 'w-5 h-5'}`} />
       </Button>
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
         {images.map((_, index) => (
           <button
             key={index}
@@ -87,18 +87,18 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
               e.stopPropagation();
               goToSlide(index);
             }}
-            className={`h-2 rounded-full transition-all ${
+            className={`transition-all ${
               index === currentIndex
-                ? 'w-6 bg-slate-100'
-                : 'w-2 bg-slate-500 hover:bg-slate-400'
-            }`}
+                ? 'bg-slate-100'
+                : 'bg-slate-500 hover:bg-slate-400'
+            } ${isCompatibilityMode ? 'h-3 w-8 rounded-full' : 'h-2 w-2 rounded-full'}`}
             aria-label={`Go to image ${index + 1}`}
           />
         ))}
       </div>
 
       {/* Image Counter */}
-      <div className="absolute top-2 right-2 bg-slate-900/70 text-slate-100 text-xs px-2 py-1 rounded">
+      <div className={`absolute top-2 right-2 bg-slate-900/70 text-slate-100 rounded ${isCompatibilityMode ? 'text-sm px-3 py-1.5' : 'text-xs px-2 py-1'}`}>
         {currentIndex + 1} / {images.length}
       </div>
     </div>

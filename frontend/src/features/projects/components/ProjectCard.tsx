@@ -46,21 +46,21 @@ export function ProjectCard({ project, images, onClick, isCompatibilityMode = fa
         </p>
       </CardHeader>
 
-      <CardContent className="space-y-3 pb-3">
-        <div className={`flex items-center ${isCompatibilityMode ? '' : 'gap-2'} text-slate-400 text-sm`}>
+      <CardContent className={`${isCompatibilityMode ? 'pb-1' : 'space-y-3 pb-3'}`}>
+        <div className={`flex items-center ${isCompatibilityMode ? 'mb-3' : 'gap-2'} text-slate-400 text-sm`}>
           <Calendar className={`w-4 h-4 flex-shrink-0 ${isCompatibilityMode ? 'mr-2' : ''}`} />
           <span>Started {new Date(project.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
         </div>
 
         {project.technologies.length > 0 && (
-          <div className={`flex flex-wrap ${isCompatibilityMode ? '' : 'gap-1.5'}`}>
+          <div className={`flex flex-wrap ${isCompatibilityMode ? 'mb-2' : 'gap-1.5'}`}>
             {project.technologies.slice(0, 3).map((tech) => (
               <Badge key={tech} variant="secondary" className={`bg-slate-800 text-slate-300 hover:bg-slate-800 text-xs ${isCompatibilityMode ? 'mr-1.5 mb-1.5' : ''}`}>
                 {tech}
               </Badge>
             ))}
             {project.technologies.length > 3 && (
-              <Badge variant="secondary" className="bg-slate-800 text-slate-300 hover:bg-slate-800 text-xs">
+              <Badge variant="secondary" className={`bg-slate-800 text-slate-300 hover:bg-slate-800 text-xs ${isCompatibilityMode ? 'mb-1.5' : ''}`}>
                 +{project.technologies.length - 3}
               </Badge>
             )}

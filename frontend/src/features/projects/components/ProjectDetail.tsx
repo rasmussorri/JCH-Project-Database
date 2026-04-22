@@ -100,15 +100,15 @@ export function ProjectDetail({
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+                <div className={`p-4 sm:p-6 lg:p-8 ${isCompatibilityMode ? '' : 'space-y-6 sm:space-y-8'}`}>
                   <DialogHeader>
                     <DialogTitle className="text-slate-100">{project.title}</DialogTitle>
                   </DialogHeader>
 
                   <div className="space-y-6">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <Info className="w-5 h-5" />
+                    <div className={isCompatibilityMode ? 'mb-8' : 'space-y-3'}>
+                      <div className={`flex items-center text-slate-300 ${isCompatibilityMode ? 'mb-3' : 'gap-2'}`}>
+                        <Info className={`w-5 h-5 ${isCompatibilityMode ? 'mr-2' : ''}`} />
                         <span>Project Description</span>
                       </div>
                       <div
@@ -119,12 +119,12 @@ export function ProjectDetail({
                       />
                     </div>
 
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <Users className="w-5 h-5" />
+                    <div className={isCompatibilityMode ? 'mb-8' : 'space-y-3'}>
+                      <div className={`flex items-center text-slate-300 ${isCompatibilityMode ? 'mb-3' : 'gap-2'}`}>
+                        <Users className={`w-5 h-5 ${isCompatibilityMode ? 'mr-2' : ''}`} />
                         <span>Team Members</span>
                       </div>
-                      <div className="pl-7 space-y-3">
+                      <div className="pl-7">
                         {project.team.map((member, index) => (
                           <div key={index} className="flex items-center gap-3">
                             <Avatar className="w-10 h-10">
@@ -138,12 +138,12 @@ export function ProjectDetail({
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <Code2 className="w-5 h-5" />
+                    <div className={isCompatibilityMode ? 'mb-8' : 'space-y-3'}>
+                      <div className={`flex items-center text-slate-300 ${isCompatibilityMode ? 'mb-3' : 'gap-2'}`}>
+                        <Code2 className={`w-5 h-5 ${isCompatibilityMode ? 'mr-2' : ''}`} />
                         <span>Technologies & Tools</span>
                       </div>
-                      <div className="pl-7 flex flex-wrap gap-2">
+                      <div className={`pl-7 flex flex-wrap ${isCompatibilityMode ? '' : 'gap-2'}`}>
                         {project.technologies.map((tech) => (
                           <Badge key={tech} variant="secondary" className="bg-slate-800 text-slate-300 hover:bg-slate-800">
                             {tech}
@@ -152,9 +152,9 @@ export function ProjectDetail({
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-slate-300">
-                        <Calendar className="w-5 h-5" />
+                    <div className={isCompatibilityMode ? 'mb-8' : 'space-y-3'}>
+                      <div className={`flex items-center text-slate-300 ${isCompatibilityMode ? 'mb-3' : 'gap-2'}`}>
+                        <Calendar className={`w-5 h-5 ${isCompatibilityMode ? 'mr-2' : ''}`} />
                         <span>Project Started</span>
                       </div>
                       <p className="text-slate-400 pl-7">
@@ -167,9 +167,9 @@ export function ProjectDetail({
                     </div>
 
                     {project.contact && (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-slate-300">
-                          <Mail className="w-5 h-5" />
+                      <div className={isCompatibilityMode ? 'mb-8' : 'space-y-3'}>
+                        <div className={`flex items-center text-slate-300 ${isCompatibilityMode ? 'mb-3' : 'gap-2'}`}>
+                          <Mail className={`w-5 h-5 ${isCompatibilityMode ? 'mr-2' : ''}`} />
                           <span>Contact</span>
                         </div>
                         <p className="text-slate-400 pl-7">{project.contact}</p>
@@ -284,9 +284,10 @@ export function ProjectDetail({
                     type="button"
                     variant="outline"
                     onClick={handleEditClick}
-                    className="border-slate-700 text-slate-300 hover:bg-slate-800 pointer-events-auto"
+                    className="border-slate-700 text-slate-300 pointer-events-auto"
+                    style={{ backgroundColor: '#1e293b', padding: '24px 32px', height: 'auto', fontSize: '18px' }}
                   >
-                    <Pencil className="w-4 h-4 mr-2" />
+                    <Pencil className="w-6 h-6 mr-3" />
                     Edit Project
                   </Button>
                 )}
@@ -295,9 +296,10 @@ export function ProjectDetail({
                     type="button"
                     variant="destructive"
                     onClick={handleDeleteClick}
-                    className="bg-red-600 hover:bg-red-700 text-white pointer-events-auto"
+                    className="text-white pointer-events-auto"
+                    style={{ backgroundColor: '#dc2626', padding: '24px 32px', height: 'auto', fontSize: '18px', border: 'none' }}
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <Trash2 className="w-6 h-6 mr-3" />
                     Delete Project
                   </Button>
                 )}

@@ -2,9 +2,10 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 
 interface IdleOverlayProps {
   isCompatibilityMode: boolean;
+  onIdle?: () => void;
 }
 
-export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
+export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
   const [isIdle, setIsIdle] = useState(false);
   const [pos, setPos] = useState({ x: 100, y: 100 });
   const velRef = useRef({ vx: 2, vy: 2 });
@@ -18,7 +19,7 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => {
       setIsIdle(true);
-    }, 5000); // 5 seconds for testing
+    }, 20000); // 20 seconds
   }, []);
 
   useEffect(() => {
@@ -110,7 +111,10 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
 
   useEffect(() => {
     setIsVisible(isIdle);
-  }, [isIdle]);
+    if (isIdle && onIdle) {
+      onIdle();
+    }
+  }, [isIdle, onIdle]);
 
   if (!isCompatibilityMode || !isVisible) return null;
 

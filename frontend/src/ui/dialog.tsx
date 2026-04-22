@@ -34,11 +34,23 @@ function DialogContent({
       >
         {children}
         <DialogPrimitive.Close 
-          className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-100 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0"
-          style={{ color: '#ff4444', border: 'none', background: 'transparent' }}
+          className="absolute top-4 right-4 rounded-full opacity-100 transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 active:outline-none"
+          style={{ 
+            color: '#ff4444', 
+            border: 'none', 
+            background: 'rgba(15, 23, 42, 0.8)', // slate-900 with opacity
+            width: '44px',
+            height: '44px',
+            display: 'flex',
+            itemsCenter: 'center',
+            justifyContent: 'center',
+            padding: '0',
+            boxShadow: 'none',
+            outline: 'none',
+            zIndex: 100
+          }}
         >
-          <XIcon style={{ width: '32px', height: '32px' }} />
-          <span className="sr-only">Close</span>
+          <XIcon style={{ width: '32px', height: '32px', display: 'block', margin: 'auto' }} />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>

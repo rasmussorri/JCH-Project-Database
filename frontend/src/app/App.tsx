@@ -289,7 +289,10 @@ function HomeWithBanner({
               onRefresh={fetchProjects}
               isCompatibilityMode={isCompatibilityMode}
             />
-            <IdleOverlay isCompatibilityMode={isCompatibilityMode} />
+            <IdleOverlay 
+              isCompatibilityMode={isCompatibilityMode} 
+              onIdle={() => setSelectedProject(null)}
+            />
           </div>
   );
 }
