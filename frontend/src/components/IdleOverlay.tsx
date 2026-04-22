@@ -34,19 +34,19 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
     };
   }, [isCompatibilityMode, resetTimer]);
 
-  // Bouncing animation
+  // Bouncing animation - Use setInterval instead of RAF for lower frequency
   useEffect(() => {
     if (!isIdle || !isCompatibilityMode) {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      if (requestRef.current) clearInterval(requestRef.current);
       return;
     }
 
-    const animate = () => {
+    requestRef.current = window.setInterval(() => {
       const { vx, vy } = velRef.current;
       let { x, y } = posRef.current;
 
-      const width = 280; // Match new width
-      const height = 100; // Match new height
+      const width = 280;
+      const height = 100;
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
 
@@ -64,12 +64,10 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
 
       posRef.current = { x, y };
       setPos({ x, y });
-      requestRef.current = requestAnimationFrame(animate);
-    };
+    }, 50); // 20fps - much easier on the hardware
 
-    requestRef.current = requestAnimationFrame(animate);
     return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      if (requestRef.current) clearInterval(requestRef.current);
     };
   }, [isIdle, isCompatibilityMode]);
 

@@ -35,8 +35,8 @@ export function ProjectCard({ project, images, onClick, isCompatibilityMode = fa
       </div>
 
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <h3 className="text-slate-100 flex-1 text-base font-semibold line-clamp-1">{project.title}</h3>
+        <div className={`flex items-start justify-between ${isCompatibilityMode ? '' : 'gap-3'} mb-2`}>
+          <h3 className={`text-slate-100 flex-1 text-base font-semibold line-clamp-1 ${isCompatibilityMode ? 'mr-3' : ''}`}>{project.title}</h3>
           <Badge variant="outline" className={`${categoryColors[project.category] ?? ''} border-0 flex-shrink-0 text-white`}>
             {project.category}
           </Badge>
@@ -47,15 +47,15 @@ export function ProjectCard({ project, images, onClick, isCompatibilityMode = fa
       </CardHeader>
 
       <CardContent className="space-y-3 pb-3">
-        <div className="flex items-center gap-2 text-slate-400 text-sm">
-          <Calendar className="w-4 h-4 flex-shrink-0" />
+        <div className={`flex items-center ${isCompatibilityMode ? '' : 'gap-2'} text-slate-400 text-sm`}>
+          <Calendar className={`w-4 h-4 flex-shrink-0 ${isCompatibilityMode ? 'mr-2' : ''}`} />
           <span>Started {new Date(project.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
         </div>
 
         {project.technologies.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className={`flex flex-wrap ${isCompatibilityMode ? '' : 'gap-1.5'}`}>
             {project.technologies.slice(0, 3).map((tech) => (
-              <Badge key={tech} variant="secondary" className="bg-slate-800 text-slate-300 hover:bg-slate-800 text-xs">
+              <Badge key={tech} variant="secondary" className={`bg-slate-800 text-slate-300 hover:bg-slate-800 text-xs ${isCompatibilityMode ? 'mr-1.5 mb-1.5' : ''}`}>
                 {tech}
               </Badge>
             ))}
@@ -69,9 +69,9 @@ export function ProjectCard({ project, images, onClick, isCompatibilityMode = fa
       </CardContent>
 
       <CardFooter className="border-t border-slate-800 pt-3 pb-3">
-        <div className="flex items-center gap-2 w-full">
-          <Users className="w-4 h-4 text-slate-500 flex-shrink-0" />
-          <div className="flex -space-x-2 flex-1 overflow-hidden">
+        <div className={`flex items-center ${isCompatibilityMode ? '' : 'gap-2'} w-full`}>
+          <Users className={`w-4 h-4 text-slate-500 flex-shrink-0 ${isCompatibilityMode ? 'mr-2' : ''}`} />
+          <div className={`flex ${isCompatibilityMode ? 'space-x-2' : '-space-x-2'} flex-1 overflow-hidden`}>
             {project.team.slice(0, 4).map((member, index) => (
               <Avatar key={index} className="w-8 h-8 border-2 border-slate-900 flex-shrink-0">
                 <AvatarFallback className="bg-slate-700 text-slate-200 text-xs">

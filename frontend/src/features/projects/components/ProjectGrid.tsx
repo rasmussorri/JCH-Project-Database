@@ -11,7 +11,7 @@ interface ProjectGridProps {
 
 export function ProjectGrid({ projects, onProjectClick, isCompatibilityMode = false }: ProjectGridProps) {
   return (
-    <ResponsiveGrid>
+    <ResponsiveGrid isCompatibilityMode={isCompatibilityMode}>
       {projects.map((project) => (
         <ProjectCard
           key={project.id}
