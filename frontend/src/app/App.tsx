@@ -14,6 +14,7 @@ import { PageContainer } from "../components/layout/PageContainer";
 import { Button } from "../ui/button";
 import { Info, X } from "lucide-react";
 import { getRuntimeProfile } from "../lib/runtimeProfile";
+import { IdleOverlay } from "../components/IdleOverlay";
 
 const JHC_BACKGROUND =
   "https://lut.pictures.fi/kuvat/LUT%20Press%20Images/Facilities/JHC%20-%20J.%20Hyneman%20Center/Working%20in%20JHC/8977-jhc-protos.jpg?img=img4k";
@@ -287,6 +288,7 @@ function HomeWithBanner({
               onRefresh={fetchProjects}
               isCompatibilityMode={isCompatibilityMode}
             />
+            <IdleOverlay isCompatibilityMode={isCompatibilityMode} />
           </div>
   );
 }
