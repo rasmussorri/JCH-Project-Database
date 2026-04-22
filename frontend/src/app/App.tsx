@@ -265,18 +265,21 @@ function HomeWithBanner({
 
             <PageContainer as="footer" className="py-6 sm:py-8 mt-4 sm:mt-6 border-t border-slate-800">
               <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-6 text-sm text-slate-400">
-                <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                <div className={`flex flex-wrap items-center ${isCompatibilityMode ? '' : 'gap-4 sm:gap-6'}`}>
                   <a
                     href="https://www.lut.fi/en/protolab-j-hyneman-center"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-slate-200 transition-colors"
+                    className={`hover:text-slate-200 transition-colors ${isCompatibilityMode ? 'mr-6' : ''}`}
                   >
                     Protolab J. Hyneman Center
                   </a>
-                  <a href="mailto:jhc@lut.fi" className="hover:text-slate-200 transition-colors">
+                  <a href="mailto:jhc@lut.fi" className={`hover:text-slate-200 transition-colors ${isCompatibilityMode ? 'mr-6' : ''}`}>
                     jhc@lut.fi
                   </a>
+                  <span className="text-slate-500">
+                    Send info on bugs and development ideas to rasmus.sorri@student.lut.fi
+                  </span>
                 </div>
               </div>
             </PageContainer>

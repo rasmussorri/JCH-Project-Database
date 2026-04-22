@@ -4,9 +4,10 @@ A project database built to showcase and track **LUT University's Protolab J. Hy
 
 Built with:
 - Cursor (Language models used: Auto, Opus 4.6, Sonnet 4.6)
+- Antigravity (Gemini 3.1 Pro High, Gemini 3 Flash)
 - ChatGPT 5.2 & 5.3 to engineer prompts for Cursor
-- Supabase
-- Vercel
+- Supabase for backend
+- Vercel for hosting
 
 ---
 
@@ -27,6 +28,7 @@ Built with:
 | Route | Purpose |
 |-------|---------|
 | `/` | Project listing with category/status filters |
+| `/?compat=1` | **Legacy Compatibility Mode** for info-screens/kiosks (Samsung Tizen/Chromium 56) |
 | `/upload/:token` | Token-based image upload (pick or capture) |
 | `/create/:token` | Mobile project creation (multi-step form with optional AI description) |
 
@@ -35,6 +37,10 @@ Built with:
 ## Features
 
 - **Browse projects** — Responsive grid of cards with image carousels, team avatars, tech badges, and status indicators. Filter by category and status.
+- **Kiosk Mode (Touch-Screen)** — Specialized features for info-displays:
+  - **Auto-scroll**: Automatically rolls through the database after 20s of inactivity.
+  - **Idle Overlay**: Displays a "This is a touch-screen" label that bounces to prevent screen burn-in and engage users.
+  - **Legacy Compatibility**: Flexbox fallbacks, margin-based layouts, and optimized animation intervals for Chromium 56-based displays.
 - **Add project (desktop)** — Full form with TipTap rich text editor for descriptions.
 - **Add project (mobile)** — Scan a QR code from the desktop app to open a multi-step creation flow on your phone, with optional AI-generated descriptions.
 - **Edit project** — Update any project field after PIN / admin password verification.
@@ -137,7 +143,7 @@ Full schema reference: `docs/database/schema.sql`.
 
 - `docs/guidelines.md` — project guidelines
 - `docs/database/schema.sql` — full schema reference
-- `docs/REDESIGN-CREATE-PROJECT.md` — create workflow spec
+- `docs/samsung_qm32r_t_hardware_specs.md` — kiosk hardware reference
 - `frontend/README.md` — frontend env, CORS, and tooling
 - `supabase/functions/README.md` — Edge Function deploy and env
 
@@ -146,3 +152,5 @@ Full schema reference: `docs/database/schema.sql`.
 ## Attributions
 
 - UI components from [shadcn/ui](https://ui.shadcn.com/) used under [MIT license](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md).
+- Icons by [Lucide](https://lucide.dev/).
+- Development assistance from **Cursor** and **Antigravity**.
