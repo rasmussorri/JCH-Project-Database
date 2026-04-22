@@ -22,8 +22,9 @@ export function ProjectCard({ project, images, onClick, isCompatibilityMode = fa
 
   return (
     <Card 
-      className={cardClassName}
+      className={cn(cardClassName, "h-full flex flex-col")}
       onClick={onClick}
+      style={isCompatibilityMode ? { height: '100%' } : {}}
     >
       <div className="relative h-40 sm:h-48 lg:h-56 overflow-hidden bg-slate-800">
         <ImageCarousel images={images} alt={project.title} contain isCompatibilityMode={isCompatibilityMode} />
@@ -46,7 +47,7 @@ export function ProjectCard({ project, images, onClick, isCompatibilityMode = fa
         </p>
       </CardHeader>
 
-      <CardContent className={`${isCompatibilityMode ? 'pb-1' : 'space-y-3 pb-3'}`}>
+      <CardContent className={cn(isCompatibilityMode ? 'pb-1' : 'space-y-3 pb-3', "flex-1")}>
         <div className={`flex items-center ${isCompatibilityMode ? 'mb-3' : 'gap-2'} text-slate-400 text-sm`}>
           <Calendar className={`w-4 h-4 flex-shrink-0 ${isCompatibilityMode ? 'mr-2' : ''}`} />
           <span>Started {new Date(project.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>

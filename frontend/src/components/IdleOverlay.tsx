@@ -46,8 +46,8 @@ export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
       const { vx, vy } = velRef.current;
       let { x, y } = posRef.current;
 
-      const width = 280;
-      const height = 100;
+      const width = 380;
+      const height = 120;
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
 
@@ -74,7 +74,7 @@ export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
 
   // Auto-scroll logic
   useEffect(() => {
-    if (!isIdle || !isCompatibilityMode) {
+    if (!isIdle) {
       if (scrollRef.current) clearInterval(scrollRef.current);
       return;
     }
@@ -90,7 +90,6 @@ export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
       if (maxScroll <= 0) return;
 
       if (currentScroll >= maxScroll - 10) {
-        // Jump back to top immediately (smooth behavior often fails on Tizen)
         window.scrollTo(0, 0);
         doc.scrollTop = 0;
         body.scrollTop = 0;
@@ -100,12 +99,12 @@ export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
         if (doc.scrollTop !== nextPos) doc.scrollTop = nextPos;
         if (body.scrollTop !== nextPos) body.scrollTop = nextPos;
       }
-    }, 85); // 15% faster than 100ms
+    }, 85);
 
     return () => {
       if (scrollRef.current) clearInterval(scrollRef.current);
     };
-  }, [isIdle, isCompatibilityMode]);
+  }, [isIdle]);
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -116,25 +115,29 @@ export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
     }
   }, [isIdle, onIdle]);
 
-  if (!isCompatibilityMode || !isVisible) return null;
+  if (!isVisible || !isCompatibilityMode) return null;
 
   return (
     <div 
-      className="fixed z-[9999] pointer-events-none select-none flex items-center justify-center p-6 text-white font-bold"
+      className="fixed z-[9999] pointer-events-none select-none flex flex-col items-center justify-center p-4 text-white font-bold"
       style={{
-        width: '280px',
-        height: '100px',
+        width: '380px',
+        height: '120px',
         backgroundColor: '#16a34a',
         border: '4px solid #86efac',
         borderRadius: '20px',
         left: pos.x + 'px',
         top: pos.y + 'px',
-        fontSize: '24px',
-        lineHeight: '1.2',
-        textAlign: 'center'
+        textAlign: 'center',
+        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
       }}
     >
-      This is a touch-screen
+      <div style={{ fontSize: '26px', marginBottom: '4px', whiteSpace: 'nowrap' }}>
+        This is a touch-screen
+      </div>
+      <div style={{ fontSize: '18px', opacity: 0.9, fontWeight: 'normal' }}>
+        Click a project to open it
+      </div>
     </div>
   );
 }

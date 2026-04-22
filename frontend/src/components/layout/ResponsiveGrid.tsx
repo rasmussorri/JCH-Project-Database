@@ -26,7 +26,8 @@ export function ResponsiveGrid({ children, className, isCompatibilityMode = fals
               width: '33.333%', 
               padding: '12px', 
               boxSizing: 'border-box',
-              float: 'left'
+              display: 'flex',
+              flexDirection: 'column'
             }}>
               {child}
             </div>
