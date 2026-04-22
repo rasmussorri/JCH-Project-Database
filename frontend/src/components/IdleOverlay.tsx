@@ -81,7 +81,6 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
     }
 
     scrollRef.current = window.setInterval(() => {
-      // Compatibility for various browsers to get current scroll position
       const doc = document.documentElement;
       const body = document.body;
       const currentScroll = window.pageYOffset || doc.scrollTop || body.scrollTop || 0;
@@ -89,18 +88,20 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
       const viewportHeight = window.innerHeight || doc.clientHeight || body.clientHeight;
       const maxScroll = totalHeight - viewportHeight;
       
-      if (maxScroll <= 0) return; // Nothing to scroll
+      if (maxScroll <= 0) return;
 
-      if (currentScroll >= maxScroll - 5) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (currentScroll >= maxScroll - 10) {
+        // Jump back to top immediately (smooth behavior often fails on Tizen)
+        window.scrollTo(0, 0);
+        doc.scrollTop = 0;
+        body.scrollTop = 0;
       } else {
-        // Try multiple methods for broad compatibility
         const nextPos = currentScroll + 1;
         window.scrollTo(0, nextPos);
         if (doc.scrollTop !== nextPos) doc.scrollTop = nextPos;
         if (body.scrollTop !== nextPos) body.scrollTop = nextPos;
       }
-    }, 100);
+    }, 85); // 15% faster than 100ms
 
     return () => {
       if (scrollRef.current) clearInterval(scrollRef.current);
@@ -110,37 +111,28 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (isIdle) {
-      // Small delay to trigger transition after mounting if we were to mount/unmount
-      // But we'll just keep it mounted when compat mode is on
-      const t = setTimeout(() => setIsVisible(true), 10);
-      return () => clearTimeout(t);
-    } else {
-      setIsVisible(false);
-    }
+    setIsVisible(isIdle);
   }, [isIdle]);
 
-  if (!isCompatibilityMode) return null;
+  if (!isCompatibilityMode || !isVisible) return null;
 
   return (
     <div 
-      className={`fixed z-[9999] pointer-events-none select-none flex items-center justify-center p-6 bg-green-600 border-2 border-green-400 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.4)] text-white font-bold text-xl transition-all duration-1000 ease-in-out ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+      className="fixed z-[9999] pointer-events-none select-none flex items-center justify-center p-6 text-white font-bold"
       style={{
         width: '280px',
         height: '100px',
-        left: 0,
-        top: 0,
-        transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
-        willChange: 'transform',
+        backgroundColor: '#16a34a',
+        border: '4px solid #86efac',
+        borderRadius: '20px',
+        left: pos.x + 'px',
+        top: pos.y + 'px',
+        fontSize: '24px',
+        lineHeight: '1.2',
+        textAlign: 'center'
       }}
     >
-      <div className="flex flex-col items-center gap-1">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-          <span className="text-[10px] uppercase tracking-[0.2em] text-green-100 opacity-90">System Active</span>
-        </div>
-        <span className="text-xl tracking-tight text-center">This is a touch-screen</span>
-      </div>
+      This is a touch-screen
     </div>
   );
 }
