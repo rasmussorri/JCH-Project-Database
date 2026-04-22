@@ -42,7 +42,7 @@ function DialogContent({
             width: '44px',
             height: '44px',
             display: 'flex',
-            itemsCenter: 'center',
+            alignItems: 'center',
             justifyContent: 'center',
             padding: '0',
             boxShadow: 'none',
