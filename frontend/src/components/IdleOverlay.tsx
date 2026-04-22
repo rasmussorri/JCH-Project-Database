@@ -18,13 +18,13 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => {
       setIsIdle(true);
-    }, 60000); // 1 minute
+    }, 5000); // 5 seconds for testing
   }, []);
 
   useEffect(() => {
     if (!isCompatibilityMode) return;
 
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    const events = ['mousedown', 'mousemove', 'keypress', 'touchstart'];
     events.forEach(event => window.addEventListener(event, resetTimer));
     resetTimer();
 
@@ -81,13 +81,24 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
     }
 
     scrollRef.current = window.setInterval(() => {
-      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      // Compatibility for various browsers to get current scroll position
+      const doc = document.documentElement;
+      const body = document.body;
+      const currentScroll = window.pageYOffset || doc.scrollTop || body.scrollTop || 0;
+      const totalHeight = Math.max(body.scrollHeight, doc.scrollHeight, body.offsetHeight, doc.offsetHeight, body.clientHeight, doc.clientHeight);
+      const viewportHeight = window.innerHeight || doc.clientHeight || body.clientHeight;
+      const maxScroll = totalHeight - viewportHeight;
       
-      if (currentScroll >= maxScroll - 2) {
+      if (maxScroll <= 0) return; // Nothing to scroll
+
+      if (currentScroll >= maxScroll - 5) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        window.scroll(0, currentScroll + 1);
+        // Try multiple methods for broad compatibility
+        const nextPos = currentScroll + 1;
+        window.scrollTo(0, nextPos);
+        if (doc.scrollTop !== nextPos) doc.scrollTop = nextPos;
+        if (body.scrollTop !== nextPos) body.scrollTop = nextPos;
       }
     }, 100);
 
