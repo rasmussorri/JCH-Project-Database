@@ -24,7 +24,7 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
   useEffect(() => {
     if (!isCompatibilityMode) return;
 
-    const events = ['mousedown', 'mousemove', 'keypress', 'touchstart'];
+    const events = ['mousedown', 'keypress', 'touchstart'];
     events.forEach(event => window.addEventListener(event, resetTimer));
     resetTimer();
 
@@ -64,7 +64,7 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
 
       posRef.current = { x, y };
       setPos({ x, y });
-    }, 50); // 20fps - much easier on the hardware
+    }, 45); // 45ms - slightly faster/smoother
 
     return () => {
       if (requestRef.current) clearInterval(requestRef.current);

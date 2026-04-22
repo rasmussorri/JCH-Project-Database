@@ -23,10 +23,10 @@ export function ResponsiveGrid({ children, className, isCompatibilityMode = fals
       {isCompatibilityMode 
         ? (Array.isArray(children) ? children : [children]).map((child, i) => (
             <div key={i} style={{ 
-              width: '50%', 
+              width: '33.333%', 
               padding: '12px', 
               boxSizing: 'border-box',
-              float: 'left' // Extra fallback for very old engines
+              float: 'left'
             }}>
               {child}
             </div>
