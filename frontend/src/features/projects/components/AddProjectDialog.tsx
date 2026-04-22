@@ -7,7 +7,7 @@ import { getInitials } from '../../../utils/formatting';
 import { RichTextEditor } from '../../../components/RichTextEditor';
 import { stripHtml } from '../../../lib/sanitizeHtml';
 import * as projectService from '../services/projectService';
-import { useApiStatus } from '../../../contexts/ApiStatusContext';
+import { useApiStatus } from '../../../contexts/useApiStatus';
 import {
   Dialog,
   DialogContent,

@@ -163,7 +163,7 @@ export async function deleteProjectImage(
   if (response?.error) throw new Error(response.error);
 }
 
-export const API_CREDITS_EXHAUSTED_MESSAGE =
+const API_CREDITS_EXHAUSTED_MESSAGE =
   'API credits exhausted. AI descriptions are temporarily unavailable.';
 
 export async function generateDescription(

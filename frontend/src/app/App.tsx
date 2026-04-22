@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import { ApiStatusProvider, useApiStatus } from "../contexts/ApiStatusContext";
+import { ApiStatusProvider } from "../contexts/ApiStatusContext";
+import { useApiStatus } from "../contexts/useApiStatus";
 import { ProjectGrid } from "../features/projects/components/ProjectGrid";
 import { ProjectDetail } from "../features/projects/components/ProjectDetail";
 import { FilterBar } from "../features/projects/components/FilterBar";

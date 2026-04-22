@@ -31,7 +31,16 @@ export function CreateFromPhoneDialog({
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined && controlledOnOpenChange !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
-  const setOpen = isControlled ? (v: boolean) => controlledOnOpenChange?.(v) : setInternalOpen;
+  const setOpen = useCallback(
+    (v: boolean) => {
+      if (isControlled) {
+        controlledOnOpenChange?.(v);
+      } else {
+        setInternalOpen(v);
+      }
+    },
+    [isControlled, controlledOnOpenChange]
+  );
   const [loading, setLoading] = useState(false);
   const [createUrl, setCreateUrl] = useState('');
   const [token, setToken] = useState('');
@@ -101,7 +110,7 @@ export function CreateFromPhoneDialog({
       supabase.removeChannel(channel);
       channelRef.current = null;
     };
-  }, [token, open, onProjectCreated]);
+  }, [token, open, onProjectCreated, setOpen]);
 
   const handleCopy = async () => {
     try {

@@ -1,4 +1,4 @@
-export interface RuntimeProfile {
+interface RuntimeProfile {
   isCompatibilityMode: boolean;
 }
 

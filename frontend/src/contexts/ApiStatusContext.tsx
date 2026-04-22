@@ -1,11 +1,5 @@
-import { createContext, useContext, useState, useCallback } from 'react';
-
-interface ApiStatusContextValue {
-  apiCreditsExhausted: boolean;
-  setApiCreditsExhausted: (value: boolean) => void;
-}
-
-const ApiStatusContext = createContext<ApiStatusContextValue | null>(null);
+import { useState, useCallback } from 'react';
+import { ApiStatusContext } from './ApiStatusContextDef';
 
 export function ApiStatusProvider({ children }: { children: React.ReactNode }) {
   const [apiCreditsExhausted, setApiCreditsExhausted] = useState(false);
@@ -19,10 +13,4 @@ export function ApiStatusProvider({ children }: { children: React.ReactNode }) {
       {children}
     </ApiStatusContext.Provider>
   );
-}
-
-export function useApiStatus() {
-  const ctx = useContext(ApiStatusContext);
-  if (!ctx) return null;
-  return ctx;
 }

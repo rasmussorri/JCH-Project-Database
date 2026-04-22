@@ -3,7 +3,7 @@ import { useEditor, EditorContent, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '../ui/utils';
 
-export interface RichTextEditorProps {
+interface RichTextEditorProps {
   value: string;
   onChange: (html: string) => void;
   placeholder?: string;

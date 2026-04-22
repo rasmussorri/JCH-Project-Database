@@ -5,9 +5,9 @@ import { PROJECT_STATUSES } from '../types';
 import type { Project, UpdateProjectPayload } from '../types';
 import { getInitials } from '../../../utils/formatting';
 import { RichTextEditor } from '../../../components/RichTextEditor';
-import { stripHtml } from '../../../lib/sanitizeHtml';
+import { sanitizeDescriptionHtml, stripHtml } from '../../../lib/sanitizeHtml';
 import * as projectService from '../services/projectService';
-import { useApiStatus } from '../../../contexts/ApiStatusContext';
+import { useApiStatus } from '../../../contexts/useApiStatus';
 import {
   Dialog,
   DialogContent,
@@ -306,7 +306,7 @@ export function EditProjectDialog({
                       <span className="text-xs text-slate-400">AI Preview:</span>
                       <div
                         className="p-3 bg-slate-900 rounded border border-slate-700 text-sm text-slate-300 max-h-40 overflow-y-auto [&_p]:my-1 [&_strong]:font-bold [&_ul]:list-disc [&_ul]:pl-4"
-                        dangerouslySetInnerHTML={{ __html: aiPreview }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeDescriptionHtml(aiPreview) }}
                       />
                       <div className="flex gap-2">
                         <Button
