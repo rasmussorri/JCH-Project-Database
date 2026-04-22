@@ -129,8 +129,10 @@
     outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
   }
 
-  body {
+  html, body {
     @apply bg-background text-foreground font-sans;
+    background-color: var(--background);
+    font-size: var(--font-size);
   }
 }
 
@@ -139,64 +141,24 @@
  */
 @layer base {
   :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
-    h1 {
-      font-size: var(--text-2xl);
+    h1, h2, h3, h4, label, button {
       font-weight: var(--font-weight-medium);
       line-height: 1.5;
     }
 
-    h2 {
-      font-size: var(--text-xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
+    h1 { font-size: var(--text-2xl); }
+    h2 { font-size: var(--text-xl); }
+    h3 { font-size: var(--text-lg); }
+    h4, p, label, button, input { font-size: var(--text-base); }
 
-    h3 {
-      font-size: var(--text-lg);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    h4 {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    p {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
-    }
-
-    label {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    button {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-    }
-
-    input {
-      font-size: var(--text-base);
+    p, input {
       font-weight: var(--font-weight-normal);
       line-height: 1.5;
     }
   }
 }
 
-html,
-body {
-  background-color: #020617;
-}
-
-html {
-  font-size: var(--font-size);
-}
+/* Removed redundant html, body background override */
 
 /* Curl element styles */
 .curl {
@@ -308,19 +270,6 @@ html {
   transition: none !important;
 }
 
-.compat-mode .text-slate-100,
-.compat-mode .text-slate-200,
-.compat-mode .text-slate-300,
-.compat-mode .text-slate-400,
-.compat-mode .text-slate-500,
-.compat-mode .text-muted-foreground {
-  color: #e2e8f0 !important;
-}
-
-.compat-mode img {
-  image-orientation: from-image !important;
-}
-
 .compat-mode p,
 .compat-mode span,
 .compat-mode h1,
@@ -336,8 +285,14 @@ html {
 .compat-mode input,
 .compat-mode textarea,
 .compat-mode select,
-.compat-mode option {
-  color: #e2e8f0;
+.compat-mode option,
+.compat-mode .text-slate-100,
+.compat-mode .text-slate-200,
+.compat-mode .text-slate-300,
+.compat-mode .text-slate-400,
+.compat-mode .text-slate-500,
+.compat-mode .text-muted-foreground {
+  color: #e2e8f0 !important;
 }
 
 .compat-mode [class*="bg-slate-"],

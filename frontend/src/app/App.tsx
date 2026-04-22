@@ -16,6 +16,8 @@ import { Info, X } from "lucide-react";
 import { getRuntimeProfile } from "../lib/runtimeProfile";
 import { IdleOverlay } from "../components/IdleOverlay";
 
+import LUT_LOGO from "../assets/lut-logo.png";
+
 const JHC_BACKGROUND =
   "https://lut.pictures.fi/kuvat/LUT%20Press%20Images/Facilities/JHC%20-%20J.%20Hyneman%20Center/Working%20in%20JHC/8977-jhc-protos.jpg?img=img4k";
 
@@ -153,17 +155,24 @@ function HomeWithBanner({
               <div className={`absolute inset-0 bg-slate-900/50 ${isCompatibilityMode ? "" : "backdrop-blur-[2px]"}`} />
 
               <PageContainer className="py-4 sm:py-6 lg:py-8 relative z-10">
-                <div className="flex bg-black border-0 overflow-hidden rounded-sm shadow-2xl w-fit max-w-full">
-                  <div
-                    className="w-2 shrink-0"
-                    style={{ backgroundColor: "#009933" }}
-                    aria-hidden
-                  />
-                  <div className="py-3 px-4 sm:py-6 sm:pl-6 sm:pr-8">
-                    <h1 className="text-white text-lg sm:text-xl lg:text-2xl font-bold tracking-tight uppercase">
-                      JHC Protolab Project Database
-                    </h1>
+                <div className="flex justify-between items-center gap-4">
+                  <div className="flex bg-black border-0 overflow-hidden rounded-sm shadow-2xl w-fit max-w-full">
+                    <div
+                      className="w-2 shrink-0"
+                      style={{ backgroundColor: "#009933" }}
+                      aria-hidden
+                    />
+                    <div className="py-3 px-4 sm:py-6 sm:pl-6 sm:pr-8">
+                      <h1 className="text-white text-lg sm:text-xl lg:text-2xl font-bold tracking-tight uppercase">
+                        JHC Protolab Project Database
+                      </h1>
+                    </div>
                   </div>
+                  <img 
+                    src={LUT_LOGO} 
+                    alt="LUT Logo" 
+                    className="h-12 sm:h-16 lg:h-20 object-contain drop-shadow-md"
+                  />
                 </div>
               </PageContainer>
             </header>

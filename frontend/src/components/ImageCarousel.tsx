@@ -79,7 +79,7 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
       </Button>
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
+      <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 flex ${isCompatibilityMode ? 'gap-2' : 'gap-1.5'}`}>
         {images.map((_, index) => (
           <button
             key={index}
@@ -91,7 +91,7 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
               index === currentIndex
                 ? 'bg-slate-100'
                 : 'bg-slate-500 hover:bg-slate-400'
-            } ${isCompatibilityMode ? 'h-3 w-8 rounded-full' : 'h-2 w-2 rounded-full'}`}
+            } ${isCompatibilityMode ? 'h-1.5 w-6 rounded-full' : 'h-1.5 w-1.5 rounded-full'}`}
             aria-label={`Go to image ${index + 1}`}
           />
         ))}
