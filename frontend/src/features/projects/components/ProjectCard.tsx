@@ -37,7 +37,7 @@ export function ProjectCard({ project, images, onClick, isCompatibilityMode = fa
       <CardHeader className="pb-3">
         <div className={`flex items-start justify-between ${isCompatibilityMode ? '' : 'gap-3'} mb-2`}>
           <h3 className={`text-slate-100 flex-1 text-base font-semibold line-clamp-1 ${isCompatibilityMode ? 'mr-3' : ''}`}>{project.title}</h3>
-          <Badge variant="outline" className={`${categoryColors[project.category] ?? ''} border-0 flex-shrink-0 text-white`}>
+          <Badge variant="outline" className={`${categoryColors[project.category] || 'bg-slate-700 text-slate-200'} border-0 flex-shrink-0`}>
             {project.category}
           </Badge>
         </div>
