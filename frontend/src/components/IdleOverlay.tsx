@@ -45,8 +45,8 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
       const { vx, vy } = velRef.current;
       let { x, y } = posRef.current;
 
-      const width = 240; // Approx width of label
-      const height = 80; // Approx height of label
+      const width = 280; // Match new width
+      const height = 100; // Match new height
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
 
@@ -55,9 +55,11 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
 
       if (x <= 0 || x + width >= screenWidth) {
         velRef.current.vx *= -1;
+        x = Math.max(0, Math.min(x, screenWidth - width));
       }
       if (y <= 0 || y + height >= screenHeight) {
         velRef.current.vy *= -1;
+        y = Math.max(0, Math.min(y, screenHeight - height));
       }
 
       posRef.current = { x, y };
@@ -79,17 +81,15 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
     }
 
     scrollRef.current = window.setInterval(() => {
-      const scrollStep = 1;
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       
-      if (window.scrollY >= maxScroll - 2) {
-        // When reaching bottom, wait a bit then jump to top
+      if (currentScroll >= maxScroll - 2) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        // Use behavior: 'auto' for performance on low-end hardware
-        window.scrollBy({ top: scrollStep, behavior: 'auto' });
+        window.scroll(0, currentScroll + 1);
       }
-    }, 100); // 10px per second - very slow roll
+    }, 100);
 
     return () => {
       if (scrollRef.current) clearInterval(scrollRef.current);
@@ -113,21 +113,22 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
 
   return (
     <div 
-      className={`fixed z-[9999] pointer-events-none select-none flex items-center justify-center p-6 bg-cyan-500/20 backdrop-blur-xl border border-cyan-500/40 rounded-2xl shadow-[0_0_50px_rgba(6,182,212,0.2)] text-white font-bold text-xl transition-all duration-1000 ease-in-out ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+      className={`fixed z-[9999] pointer-events-none select-none flex items-center justify-center p-6 bg-green-600 border-2 border-green-400 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.4)] text-white font-bold text-xl transition-all duration-1000 ease-in-out ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
       style={{
-        width: '240px',
-        height: '80px',
+        width: '280px',
+        height: '100px',
         left: 0,
         top: 0,
-        transform: `translate(${pos.x}px, ${pos.y}px) ${isVisible ? '' : 'scale(0.95)'}`,
+        transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
+        willChange: 'transform',
       }}
     >
       <div className="flex flex-col items-center gap-1">
         <div className="flex items-center gap-2 mb-1">
-          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="text-[10px] uppercase tracking-[0.2em] text-cyan-300 opacity-90">System Active</span>
+          <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+          <span className="text-[10px] uppercase tracking-[0.2em] text-green-100 opacity-90">System Active</span>
         </div>
-        <span className="text-lg tracking-tight">Touch Screen</span>
+        <span className="text-xl tracking-tight text-center">This is a touch-screen</span>
       </div>
     </div>
   );

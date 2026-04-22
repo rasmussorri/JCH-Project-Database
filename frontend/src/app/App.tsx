@@ -208,6 +208,7 @@ function HomeWithBanner({
                 onCategoryChange={setFilteredCategory}
                 onStatusChange={setFilteredStatus}
                 projects={projects}
+                isCompatibilityMode={isCompatibilityMode}
                 addProjectSlot={
                   <>
                     <Button
