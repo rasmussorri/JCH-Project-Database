@@ -64,7 +64,7 @@ export function IdleOverlay({ isCompatibilityMode }: IdleOverlayProps) {
 
       posRef.current = { x, y };
       setPos({ x, y });
-    }, 45); // 45ms - slightly faster/smoother
+    }, 32); // 32ms (~31fps) - The 'sweet spot' for smooth signage motion
 
     return () => {
       if (requestRef.current) clearInterval(requestRef.current);
