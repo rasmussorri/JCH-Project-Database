@@ -141,7 +141,7 @@ function HomeWithBanner({
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setShowHeader(window.scrollY < 10);
+    const handleScroll = () => setShowHeader(window.scrollY < 250);
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
