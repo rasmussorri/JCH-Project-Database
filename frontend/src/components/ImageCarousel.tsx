@@ -62,7 +62,7 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
         variant="ghost"
         size="icon"
         onClick={goToPrevious}
-        className={`absolute left-2 top-1/2 -translate-y-1/2 bg-slate-900/70 hover:bg-slate-900/90 text-slate-100 transition-opacity ${isCompatibilityMode ? 'opacity-100 w-12 h-12' : 'opacity-0 group-hover:opacity-100'}`}
+        className={`absolute left-2 top-1/2 -translate-y-1/2 text-slate-100 transition-opacity ${isCompatibilityMode ? 'bg-transparent hover:bg-transparent opacity-100 w-12 h-12' : 'bg-slate-900/70 hover:bg-slate-900/90 opacity-0 group-hover:opacity-100'}`}
         aria-label="Previous image"
       >
         <ChevronLeft className={`${isCompatibilityMode ? 'w-8 h-8' : 'w-5 h-5'}`} />
@@ -72,7 +72,7 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
         variant="ghost"
         size="icon"
         onClick={goToNext}
-        className={`absolute right-2 top-1/2 -translate-y-1/2 bg-slate-900/70 hover:bg-slate-900/90 text-slate-100 transition-opacity ${isCompatibilityMode ? 'opacity-100 w-12 h-12' : 'opacity-0 group-hover:opacity-100'}`}
+        className={`absolute right-2 top-1/2 -translate-y-1/2 text-slate-100 transition-opacity ${isCompatibilityMode ? 'bg-transparent hover:bg-transparent opacity-100 w-12 h-12' : 'bg-slate-900/70 hover:bg-slate-900/90 opacity-0 group-hover:opacity-100'}`}
         aria-label="Next image"
       >
         <ChevronRight className={`${isCompatibilityMode ? 'w-8 h-8' : 'w-5 h-5'}`} />
@@ -98,7 +98,7 @@ export function ImageCarousel({ images, alt, className = '', contain = false, is
       </div>
 
       {/* Image Counter */}
-      <div className={`absolute top-2 right-2 bg-slate-900/70 text-slate-100 rounded ${isCompatibilityMode ? 'text-sm px-3 py-1.5' : 'text-xs px-2 py-1'}`}>
+      <div className={`absolute top-2 right-2 text-slate-100 rounded ${isCompatibilityMode ? 'bg-transparent text-sm px-3 py-1.5' : 'bg-slate-900/70 text-xs px-2 py-1'}`}>
         {currentIndex + 1} / {images.length}
       </div>
     </div>

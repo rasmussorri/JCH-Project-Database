@@ -188,5 +188,20 @@ export async function generateDescription(
 
   if (!response?.descriptionHtml) throw new Error('Empty AI response.');
 
-  return response.descriptionHtml;
+  // Instant fix: Strip HTML and format with dashes for the plain text editor
+  let text = response.descriptionHtml;
+  
+  // Replace HTML paragraphs and list items with newlines and dashes
+  text = text.replace(/<\/p>/g, '\n\n');
+  text = text.replace(/<li>/g, '- ');
+  text = text.replace(/<\/li>/g, '\n');
+  text = text.replace(/<br\s*\/?>/g, '\n');
+  
+  // Strip all other HTML tags
+  text = text.replace(/<[^>]*>/g, '');
+  
+  // Clean up extra whitespace/newlines
+  text = text.trim().replace(/\n{3,}/g, '\n\n');
+
+  return text;
 }
