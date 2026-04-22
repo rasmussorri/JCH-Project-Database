@@ -23,8 +23,6 @@ export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
   }, []);
 
   useEffect(() => {
-    if (!isCompatibilityMode) return;
-
     const events = ['mousedown', 'keypress', 'touchstart'];
     events.forEach(event => window.addEventListener(event, resetTimer));
     resetTimer();
@@ -33,7 +31,7 @@ export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
       events.forEach(event => window.removeEventListener(event, resetTimer));
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, [isCompatibilityMode, resetTimer]);
+  }, [resetTimer]);
 
   // Bouncing animation - Use setInterval instead of RAF for lower frequency
   useEffect(() => {
@@ -115,6 +113,7 @@ export function IdleOverlay({ isCompatibilityMode, onIdle }: IdleOverlayProps) {
     }
   }, [isIdle, onIdle]);
 
+  // Only render the visual label in compatibility mode
   if (!isVisible || !isCompatibilityMode) return null;
 
   return (

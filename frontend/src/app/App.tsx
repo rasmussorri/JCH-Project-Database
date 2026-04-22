@@ -137,20 +137,12 @@ function HomeWithBanner({
   isCompatibilityMode: boolean;
 }) {
   const apiStatus = useApiStatus();
-  const [showHeader, setShowHeader] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setShowHeader(window.scrollY < 250);
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <div className="min-h-screen bg-slate-950 relative">
             <header
-              className={`relative border-b border-slate-800 sticky top-0 z-10 shadow-xl overflow-hidden transition-transform duration-300 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
+              className="relative border-b border-slate-800 shadow-xl overflow-hidden"
             >
               <img
                 src={JHC_BACKGROUND}
